@@ -15,7 +15,8 @@
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
+            margin: 0;
         }
 
         .container {
@@ -25,28 +26,44 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             overflow: hidden;
+            width: 100%;
         }
 
         .header {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.2;
         }
 
         .header p {
-            font-size: 1.2em;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
             opacity: 0.9;
+            margin: 0;
         }
 
         .main-content {
-            padding: 40px;
+            padding: 20px;
+        }
+
+        /* 반응형 미디어 쿼리 */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px;
+            }
+            .main-content {
+                padding: 40px;
+            }
         }
 
         .mechanism-grid {
@@ -216,73 +233,194 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border-radius: 15px;
-            padding: 30px;
-            margin: 40px 0;
+            padding: 20px;
+            margin: 30px 0;
         }
 
         .traffic-title {
-            font-size: 1.8em;
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
             margin-bottom: 20px;
             text-align: center;
+            line-height: 1.3;
         }
 
         .accident-types {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
         .accident-card {
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             backdrop-filter: blur(10px);
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .accident-card:hover {
             background: rgba(255,255,255,0.2);
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .accident-card.active {
             background: rgba(255,255,255,0.3);
             border: 2px solid #fff;
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .accident-icon {
-            font-size: 2em;
-            margin-bottom: 15px;
-            text-align: center;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 10px;
+        }
+
+        .accident-card h3 {
+            margin: 8px 0;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        }
+
+        .accident-card p {
+            margin: 0;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        /* 모바일에서 2열, 태블릿 이상에서 4열 */
+        @media (max-width: 767px) {
+            .accident-types {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .accident-card {
+                padding: 12px;
+                min-height: 100px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .traffic-accident {
+                padding: 30px;
+                margin: 40px 0;
+            }
+            
+            .accident-types {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+            
+            .accident-card {
+                padding: 20px;
+                min-height: 140px;
+            }
+            
+            .accident-card:hover {
+                transform: scale(1.05);
+            }
+            
+            .accident-card.active {
+                transform: scale(1.05);
+            }
         }
 
         .reference-note {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 15px;
+            margin-top: 20px;
             text-align: center;
             color: #6c757d;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            line-height: 1.5;
         }
 
         .btn-reset {
             background: #6c757d;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin: 20px auto;
             display: block;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            min-width: 160px;
         }
 
         .btn-reset:hover {
             background: #495057;
             transform: scale(1.05);
+        }
+
+        /* 제목 스타일 반응형 */
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            line-height: 1.3;
+            padding: 0 10px;
+        }
+
+        /* 터치 디바이스 최적화 */
+        @media (max-width: 767px) {
+            .mechanism-card, .accident-card {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            }
+            
+            .reference-note {
+                padding: 12px;
+                margin-top: 15px;
+            }
+            
+            .btn-reset {
+                padding: 10px 20px;
+                margin: 15px auto;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .reference-note {
+                padding: 20px;
+                margin-top: 30px;
+            }
+            
+            h2 {
+                margin-bottom: 30px;
+                padding: 0;
+            }
+        }
+
+        /* 고해상도 디스플레이 최적화 */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .header h1 {
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            }
+        }
+
+        /* 가로 모드 모바일 최적화 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .mechanism-card {
+                min-height: 140px;
+            }
         }
     </style>
 </head>
@@ -356,7 +494,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    충돌 지점에서 최대 에너지가 집중되므로 국소적 손상이 주요 특징입니다.
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">충돌 지점에서 최대 에너지가 집중되므로 국소적 손상이 주요 특징입니다.</span>
                 </div>
             </div>
 
@@ -386,7 +524,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    에너지 전달 경로 상의 모든 부위 사정이 최우선입니다.
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">에너지 전달 경로 상의 모든 부위 사정이 최우선입니다.</span>
                 </div>
             </div>
 
@@ -417,7 +555,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    내출혈 모니터링이 최우선입니다!
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">내출혈 모니터링이 최우선입니다!</span>
                 </div>
             </div>
 
@@ -448,7 +586,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    신경혈관 상태 집중 관찰이 필수입니다!
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">신경혈관 상태 집중 관찰이 필수입니다!</span>
                 </div>
             </div>
 
@@ -479,7 +617,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    구획증후군과 재관류 손상 주의! 전해질 모니터링 중요!
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">구획증후군과 재관류 손상 주의! 전해질 모니터링 중요!</span>
                 </div>
             </div>
 
@@ -517,17 +655,17 @@
                     <div class="detail-title">정면 충돌 (Frontal Collision)</div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
-                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107;">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 10px; border-left: 4px solid #ffc107;">
                         <div class="section-title">🔽 Down and Under 패턴</div>
-                        <p style="margin-bottom: 15px;"><strong>발생순서:</strong></p>
+                        <p style="margin-bottom: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>발생순서:</strong></p>
                         <ul class="example-list">
                             <li>차량 급정지 → 몸이 앞으로 밀림</li>
                             <li>무릎이 대시보드 충돌</li>
                             <li>에너지가 다리를 따라 전달</li>
                             <li>상체가 계속 앞으로 움직임</li>
                         </ul>
-                        <p style="margin-top: 15px;"><strong>예상손상:</strong></p>
+                        <p style="margin-top: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>예상손상:</strong></p>
                         <ul class="example-list">
                             <li>슬개골 골절, 무릎 인대 파열</li>
                             <li>대퇴골 간부 골절</li>
@@ -536,16 +674,16 @@
                         </ul>
                     </div>
                     
-                    <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; border-left: 4px solid #27ae60;">
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; border-left: 4px solid #27ae60;">
                         <div class="section-title">🔼 Up and Over 패턴</div>
-                        <p style="margin-bottom: 15px;"><strong>발생순서:</strong></p>
+                        <p style="margin-bottom: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>발생순서:</strong></p>
                         <ul class="example-list">
                             <li>차량 급정지 → 관성으로 몸이 앞으로</li>
                             <li>머리/가슴이 충돌</li>
                             <li>목이 과도하게 굽어짐</li>
                             <li>내장기관도 앞으로 밀림</li>
                         </ul>
-                        <p style="margin-top: 15px;"><strong>예상손상:</strong></p>
+                        <p style="margin-top: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>예상손상:</strong></p>
                         <ul class="example-list">
                             <li>두개골 골절, 뇌출혈, 뇌진탕</li>
                             <li>경추 골절, 척수 손상</li>
@@ -554,10 +692,33 @@
                         </ul>
                     </div>
                 </div>
+
+                <!-- 태블릿 이상에서 2열 레이아웃 -->
+                <style>
+                @media (min-width: 768px) {
+                    #frontal-detail > div:nth-child(2) {
+                        grid-template-columns: 1fr 1fr !important;
+                        gap: 25px !important;
+                        margin-bottom: 25px !important;
+                    }
+                    
+                    #frontal-detail .section-title + p {
+                        margin-bottom: 15px !important;
+                    }
+                    
+                    #frontal-detail .example-list + p {
+                        margin-top: 15px !important;
+                    }
+                    
+                    #frontal-detail > div:nth-child(2) > div {
+                        padding: 20px !important;
+                    }
+                }
+                </style>
                 
                 <div class="priority-box">
                     <div class="priority-title">🚨 간호 우선순위</div>
-                    Down & Under: 골반 골절로 인한 내출혈 주의 | Up & Over: 기도 확보 및 경추 고정이 최우선!
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">Down & Under: 골반 골절로 인한 내출혈 주의 | Up & Over: 기도 확보 및 경추 고정이 최우선!</span>
                 </div>
             </div>
 
@@ -590,7 +751,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 왜 측면 충돌이 위험한가?</div>
-                    측면은 정면/후면보다 보호 구조가 약하고, 문과 승객 사이 거리가 가까워(30-40cm) 충격을 흡수할 공간이 부족합니다.
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">측면은 정면/후면보다 보호 구조가 약하고, 문과 승객 사이 거리가 가까워(30-40cm) 충격을 흡수할 공간이 부족합니다.</span>
                 </div>
             </div>
 
@@ -655,7 +816,7 @@
                 </div>
                 <div class="priority-box">
                     <div class="priority-title">🚨 전복 사고가 가장 위험한 이유</div>
-                    예측 불가능한 충격 방향, 반복적 충돌, 다양한 손상 기전이 혼재하며, 차량 변형으로 구조가 지연됩니다.
+                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">예측 불가능한 충격 방향, 반복적 충돌, 다양한 손상 기전이 혼재하며, 차량 변형으로 구조가 지연됩니다.</span>
                 </div>
             </div>
 

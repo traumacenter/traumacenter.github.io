@@ -1,16 +1,21 @@
-
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>낙상 손상 기전 시각화</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>교통사고 손상 기전 시각화</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
+            min-height: 100vh;
         }
         
         .container {
@@ -18,43 +23,85 @@
             margin: 0 auto;
             background: white;
             border-radius: 15px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         
         .header h1 {
             color: #2c3e50;
-            font-size: 2.5em;
+            font-size: clamp(1.8em, 4vw, 2.5em);
             margin-bottom: 10px;
+            line-height: 1.2;
         }
         
         .header p {
             color: #7f8c8d;
-            font-size: 1.2em;
+            font-size: clamp(1em, 2.5vw, 1.2em);
+            line-height: 1.4;
+            margin: 0 10px;
         }
         
         .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
         
         .btn {
-            padding: 15px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 25px;
+            font-size: clamp(12px, 3vw, 16px);
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
+            line-height: 1.3;
+            min-width: 120px;
+        }
+        
+        /* 모바일에서 버튼 조정 */
+        @media (max-width: 768px) {
+            .controls {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .btn {
+                min-width: auto;
+                padding: 15px 10px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 15px;
+                border-radius: 10px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
         }
         
         .btn:hover {
@@ -62,165 +109,98 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
         
-        .btn-low { background: #2ecc71; color: white; }
-        .btn-medium { background: #f39c12; color: white; }
-        .btn-high { background: #e74c3c; color: white; }
-        .btn-feet { background: #3498db; color: white; }
-        .btn-head { background: #9b59b6; color: white; }
-        .btn-side { background: #1abc9c; color: white; }
+        /* 터치 디바이스에서 호버 효과 비활성화 */
+        @media (hover: none) {
+            .btn:hover {
+                transform: none;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+        }
+        
+        .btn-front { background: #e74c3c; color: white; }
+        .btn-side { background: #f39c12; color: white; }
+        .btn-rear { background: #3498db; color: white; }
+        .btn-rollover { background: #9b59b6; color: white; }
         .btn-active { background: #27ae60; color: white; }
         
         .simulation-area {
             display: flex;
             justify-content: center;
-            align-items: flex-end;
-            min-height: 500px;
-            background: linear-gradient(to bottom, #87ceeb 0%, #87ceeb 60%, #90ee90 60%, #90ee90 100%);
+            align-items: center;
+            min-height: 300px;
+            height: 50vh;
+            max-height: 400px;
+            background: #f8f9fa;
             border-radius: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
         
-        .building {
-            position: absolute;
-            left: 100px;
-            bottom: 0;
-            width: 120px;
-            background: #95a5a6;
-            border: 2px solid #7f8c8d;
+        /* 모바일에서 시뮬레이션 영역 조정 */
+        @media (max-width: 768px) {
+            .simulation-area {
+                min-height: 250px;
+                height: 40vh;
+                margin-bottom: 20px;
+            }
         }
         
-        .floor {
-            height: 60px;
-            border-bottom: 1px solid #7f8c8d;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #2c3e50;
+        @media (max-width: 480px) {
+            .simulation-area {
+                min-height: 200px;
+                height: 35vh;
+            }
         }
         
-        .person {
-            position: absolute;
-            transition: all 2s ease-in-out;
-        }
-        
-        .person-body {
-            width: 20px;
-            height: 40px;
-            position: relative;
-        }
-        
-        .head {
-            width: 12px;
-            height: 12px;
-            background: #f4d03f;
-            border-radius: 50%;
-            margin: 0 auto 2px;
-        }
-        
-        .body {
-            width: 16px;
-            height: 20px;
-            background: #e74c3c;
-            margin: 0 auto 2px;
-            border-radius: 2px;
-        }
-        
-        .legs {
-            width: 16px;
-            height: 16px;
-            background: #3498db;
-            margin: 0 auto;
-            border-radius: 2px;
-        }
-        
-        .ground {
+        .road {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 40px;
-            background: #8b4513;
-            border-top: 3px solid #654321;
+            height: clamp(40px, 8vh, 60px);
+            background: #34495e;
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                #fff 10px,
+                #fff 30px
+            );
         }
         
-        .energy-line {
-            position: absolute;
+        svg {
+            max-width: 800px;
+            width: 100%;
+            height: 100%;
+            max-height: 400px;
+        }
+        
+        .car {
+            transition: all 0.8s ease;
+        }
+        
+        .person {
+            transition: all 0.8s ease;
+        }
+        
+        .impact-line {
+            stroke: #e74c3c;
+            stroke-width: 3;
+            stroke-dasharray: 5,5;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
         
-        .injury-indicator {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, rgba(231,76,60,0.8) 0%, rgba(231,76,60,0.2) 100%);
-            border-radius: 50%;
+        .injury-zone {
+            fill: rgba(231, 76, 60, 0.3);
             opacity: 0;
             transition: opacity 0.5s ease;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        @keyframes fall {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(400px) rotate(180deg); }
-        }
-        
-        @keyframes impact {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.3); }
-            50% { transform: scale(0.8); }
-            100% { transform: scale(1); }
-        }
-        
-        .fall-animation {
-            animation: fall 2s ease-in;
-        }
-        
-        .impact-animation {
-            animation: impact 0.5s ease-out;
-        }
-        
-        .stats-panel {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9em;
-            color: #7f8c8d;
         }
         
         .explanation {
-            background: #f8f9fa;
-            padding: 25px;
+            background: #ecf0f1;
+            padding: clamp(15px, 4vw, 25px);
             border-radius: 10px;
             border-left: 5px solid #3498db;
         }
@@ -228,479 +208,412 @@
         .explanation h3 {
             color: #2c3e50;
             margin-top: 0;
-            font-size: 1.5em;
+            font-size: clamp(1.2em, 3.5vw, 1.5em);
+            line-height: 1.3;
+        }
+        
+        .explanation p {
+            font-size: clamp(0.9em, 2.5vw, 1em);
+            line-height: 1.5;
+            margin: 10px 0;
         }
         
         .injury-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
         
+        /* 모바일에서 손상 리스트 조정 */
+        @media (max-width: 768px) {
+            .injury-list {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-top: 15px;
+            }
+        }
+        
         .injury-item {
             background: white;
-            padding: 15px;
+            padding: clamp(12px, 3vw, 15px);
             border-radius: 8px;
             border-left: 4px solid #e74c3c;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .injury-item h4 {
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             color: #2c3e50;
+            font-size: clamp(0.9em, 2.5vw, 1em);
+            line-height: 1.3;
         }
         
-        .severity {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
+        .injury-item p {
+            font-size: clamp(0.8em, 2.2vw, 0.9em);
+            line-height: 1.4;
+            margin: 5px 0;
         }
-        
-        .severity-low { background: #2ecc71; color: white; }
-        .severity-medium { background: #f39c12; color: white; }
-        .severity-high { background: #e74c3c; color: white; }
-        .severity-critical { background: #8e44ad; color: white; }
         
         .hidden {
             display: none;
         }
         
-        .trajectory {
-            position: absolute;
-            stroke: #e74c3c;
-            stroke-width: 2;
-            stroke-dasharray: 5,5;
-            fill: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-shake {
+            animation: shake 0.6s ease-in-out;
+        }
+        
+        .animate-bounce {
+            animation: bounce 0.8s ease-in-out;
+        }
+        
+        /* 가로 모드 최적화 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .simulation-area {
+                height: 60vh;
+                min-height: 250px;
+            }
+        }
+        
+        /* 아주 작은 화면 최적화 */
+        @media (max-width: 320px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .btn {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+            
+            .simulation-area {
+                min-height: 180px;
+                height: 30vh;
+            }
+            
+            .explanation {
+                padding: 12px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏗️ 낙상 손상 기전 시각화</h1>
-            <p>높이별, 착지 자세별로 다양한 낙상 상황과 예상 손상을 확인해보세요</p>
+            <h1>🚗 교통사고 손상 기전 시각화</h1>
+            <p>각 버튼을 클릭하여 다양한 교통사고 유형과 손상 기전을 확인해보세요</p>
         </div>
         
         <div class="controls">
-            <button class="btn btn-low" onclick="showFall('low', 'feet')">🟢 저층 발착지<br>(1-2층, 하지 손상)</button>
-            <button class="btn btn-medium" onclick="showFall('medium', 'feet')">🟡 중층 발착지<br>(3-4층, 다발 손상)</button>
-            <button class="btn btn-high" onclick="showFall('high', 'feet')">🔴 고층 발착지<br>(5층+, 생명 위험)</button>
-            <button class="btn btn-head" onclick="showFall('medium', 'head')">🟣 머리 착지<br>(극도 위험)</button>
-            <button class="btn btn-side" onclick="showFall('medium', 'side')">🔵 옆으로 착지<br>(측면 손상)</button>
+            <button class="btn btn-front" onclick="showCollision('front')">정면 충돌</button>
+            <button class="btn btn-side" onclick="showCollision('side')">측면 충돌</button>
+            <button class="btn btn-rear" onclick="showCollision('rear')">후면 충돌</button>
+            <button class="btn btn-rollover" onclick="showCollision('rollover')">전복 사고</button>
         </div>
         
-        <div class="stats-panel" id="stats-panel">
-            <div class="stat-item">
-                <div class="stat-value" id="height-value">0m</div>
-                <div class="stat-label">낙상 높이</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="speed-value">0km/h</div>
-                <div class="stat-label">충돌 속도</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="energy-value">0J</div>
-                <div class="stat-label">충격 에너지</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="survival-value">100%</div>
-                <div class="stat-label">생존율</div>
-            </div>
-        </div>
-        
-        <div class="simulation-area" id="simulation-area">
-            <div class="building" id="building">
-                <div class="floor" id="floor-5">5층</div>
-                <div class="floor" id="floor-4">4층</div>
-                <div class="floor" id="floor-3">3층</div>
-                <div class="floor" id="floor-2">2층</div>
-                <div class="floor" id="floor-1">1층</div>
-            </div>
-            
-            <div class="person" id="person">
-                <div class="person-body">
-                    <div class="head"></div>
-                    <div class="body"></div>
-                    <div class="legs"></div>
-                </div>
-            </div>
-            
-            <div class="ground"></div>
-            
-            <!-- 손상 지시자들 -->
-            <div class="injury-indicator" id="head-injury" style="left: 300px; bottom: 30px;"></div>
-            <div class="injury-indicator" id="spine-injury" style="left: 300px; bottom: 50px;"></div>
-            <div class="injury-indicator" id="leg-injury" style="left: 300px; bottom: 10px;"></div>
-            <div class="injury-indicator" id="organ-injury" style="left: 300px; bottom: 35px;"></div>
-            
-            <!-- 에너지 전달 라인 -->
-            <svg class="trajectory" id="energy-path" width="400" height="500">
-                <path d="M 300 450 L 300 400 L 300 350 L 300 300 L 300 250" stroke="#e74c3c" stroke-width="3"/>
+        <div class="simulation-area">
+            <div class="road"></div>
+            <svg viewBox="0 0 800 400" id="collision-svg">
+                <!-- 정면 충돌 -->
+                <g id="front-collision" class="hidden">
+                    <!-- 벽/장애물 -->
+                    <rect x="620" y="150" width="30" height="100" fill="#95a5a6" stroke="#7f8c8d" stroke-width="2"/>
+                    
+                    <!-- 자동차 -->
+                    <g class="car" id="front-car">
+                        <rect x="450" y="180" width="120" height="60" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                        <circle cx="470" cy="250" r="15" fill="#2c3e50"/>
+                        <circle cx="550" cy="250" r="15" fill="#2c3e50"/>
+                        <rect x="460" y="190" width="100" height="40" rx="5" fill="#5dade2"/>
+                        
+                        <!-- 승객 (Up and Over) -->
+                        <g class="person" id="person-up">
+                            <circle cx="500" cy="200" r="8" fill="#f4d03f"/>
+                            <rect x="496" y="208" width="8" height="15" fill="#e74c3c"/>
+                            <line x1="496" y1="215" x2="490" y2="230" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="504" y1="215" x2="510" y2="230" stroke="#2c3e50" stroke-width="2"/>
+                        </g>
+                        
+                        <!-- 승객 (Down and Under) -->
+                        <g class="person" id="person-down">
+                            <circle cx="520" cy="205" r="8" fill="#f4d03f"/>
+                            <rect x="516" y="213" width="8" height="15" fill="#e74c3c"/>
+                            <line x1="516" y1="220" x2="510" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="524" y1="220" x2="530" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                        </g>
+                    </g>
+                    
+                    <!-- 충격 방향 화살표 -->
+                    <path d="M 350 210 L 430 210" stroke="#e74c3c" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- 손상 구역 -->
+                    <ellipse cx="500" cy="180" rx="40" ry="20" class="injury-zone" id="head-injury"/>
+                    <ellipse cx="520" cy="240" rx="35" ry="15" class="injury-zone" id="knee-injury"/>
+                </g>
+                
+                <!-- 측면 충돌 -->
+                <g id="side-collision" class="hidden">
+                    <!-- 충돌하는 차 -->
+                    <g class="car" id="side-car-1">
+                        <rect x="200" y="100" width="60" height="120" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+                        <circle cx="180" cy="120" r="15" fill="#2c3e50"/>
+                        <circle cx="180" cy="200" r="15" fill="#2c3e50"/>
+                        <rect x="210" y="110" width="40" height="100" rx="5" fill="#ec7063"/>
+                    </g>
+                    
+                    <!-- 피해 차량 -->
+                    <g class="car" id="side-car-2">
+                        <rect x="350" y="180" width="120" height="60" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                        <circle cx="370" cy="250" r="15" fill="#2c3e50"/>
+                        <circle cx="450" cy="250" r="15" fill="#2c3e50"/>
+                        <rect x="360" y="190" width="100" height="40" rx="5" fill="#5dade2"/>
+                        
+                        <!-- 승객 -->
+                        <g class="person" id="side-person">
+                            <circle cx="400" cy="205" r="8" fill="#f4d03f"/>
+                            <rect x="396" y="213" width="8" height="15" fill="#e74c3c"/>
+                            <line x1="396" y1="220" x2="390" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="404" y1="220" x2="410" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                        </g>
+                    </g>
+                    
+                    <!-- 충격 방향 화살표 -->
+                    <path d="M 230 160 L 340 200" stroke="#e74c3c" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- 손상 구역 -->
+                    <ellipse cx="370" cy="205" rx="25" ry="40" class="injury-zone" id="side-injury"/>
+                </g>
+                
+                <!-- 후면 충돌 -->
+                <g id="rear-collision" class="hidden">
+                    <!-- 후방 차량 -->
+                    <g class="car" id="rear-car-1">
+                        <rect x="200" y="180" width="120" height="60" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+                        <circle cx="220" cy="250" r="15" fill="#2c3e50"/>
+                        <circle cx="300" cy="250" r="15" fill="#2c3e50"/>
+                        <rect x="210" y="190" width="100" height="40" rx="5" fill="#ec7063"/>
+                    </g>
+                    
+                    <!-- 앞 차량 -->
+                    <g class="car" id="rear-car-2">
+                        <rect x="450" y="180" width="120" height="60" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                        <circle cx="470" cy="250" r="15" fill="#2c3e50"/>
+                        <circle cx="550" cy="250" r="15" fill="#2c3e50"/>
+                        <rect x="460" y="190" width="100" height="40" rx="5" fill="#5dade2"/>
+                        
+                        <!-- 승객 (Whiplash) -->
+                        <g class="person" id="whiplash-person">
+                            <circle cx="500" cy="205" r="8" fill="#f4d03f"/>
+                            <rect x="496" y="213" width="8" height="15" fill="#e74c3c"/>
+                            <line x1="496" y1="220" x2="490" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="504" y1="220" x2="510" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                            <!-- 목 움직임 표시 -->
+                            <path d="M 500 205 Q 485 190 475 185" stroke="#e74c3c" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+                            <path d="M 500 205 Q 515 185 525 180" stroke="#f39c12" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+                        </g>
+                    </g>
+                    
+                    <!-- 충격 방향 화살표 -->
+                    <path d="M 340 210 L 430 210" stroke="#e74c3c" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- 손상 구역 -->
+                    <ellipse cx="500" cy="190" rx="30" ry="15" class="injury-zone" id="neck-injury"/>
+                </g>
+                
+                <!-- 전복 사고 -->
+                <g id="rollover-collision" class="hidden">
+                    <!-- 뒤집힌 차량 -->
+                    <g class="car" id="rollover-car" transform="rotate(45 400 200)">
+                        <rect x="350" y="180" width="120" height="60" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+                        <circle cx="370" cy="250" r="15" fill="#2c3e50"/>
+                        <circle cx="450" cy="250" r="15" fill="#2c3e50"/>
+                        <rect x="360" y="190" width="100" height="40" rx="5" fill="#bb8fce"/>
+                        
+                        <!-- 승객 -->
+                        <g class="person" id="rollover-person">
+                            <circle cx="400" cy="205" r="8" fill="#f4d03f"/>
+                            <rect x="396" y="213" width="8" height="15" fill="#e74c3c"/>
+                            <line x1="396" y1="220" x2="390" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="404" y1="220" x2="410" y2="235" stroke="#2c3e50" stroke-width="2"/>
+                        </g>
+                    </g>
+                    
+                    <!-- 회전 화살표 -->
+                    <path d="M 400 120 A 80 80 0 1 1 480 200" stroke="#e74c3c" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+                    
+                    <!-- 다발성 손상 구역 -->
+                    <ellipse cx="400" cy="200" rx="60" ry="40" class="injury-zone" id="multiple-injury"/>
+                </g>
+                
+                <!-- 화살표 마커 정의 -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+                    </marker>
+                </defs>
             </svg>
         </div>
         
         <div class="explanation" id="explanation">
-            <h3>🔍 낙상 시나리오를 선택해주세요</h3>
-            <p>위의 버튼을 클릭하여 다양한 낙상 상황별 손상 기전과 예상 손상 부위를 확인해보세요.</p>
+            <h3>🔍 교통사고 유형을 선택해주세요</h3>
+            <p>위의 버튼을 클릭하여 각 교통사고 유형별 손상 기전과 예상 손상 부위를 확인해보세요.</p>
         </div>
     </div>
 
     <script>
-        const fallScenarios = {
-            'low-feet': {
-                title: "🟢 저층 낙상 - 발부터 착지 (1-2층)",
-                height: 6,
-                speed: 35,
-                energy: 4116,
-                survival: 95,
-                startFloor: 2,
-                landingType: 'feet',
+        const explanations = {
+            front: {
+                title: "🚗 정면 충돌 (Frontal Collision)",
                 content: `
-                    <p><strong>🏗️ 시나리오:</strong> 건설현장에서 2층 높이 사다리(6m)에서 발부터 떨어짐</p>
+                    <p><strong>발생 기전:</strong> 차량이 정면으로 충돌하면서 승객이 관성에 의해 앞으로 밀려나는 상황</p>
                     <div class="injury-list">
                         <div class="injury-item">
-                            <h4>🦶 1차 충격 부위</h4>
-                            <span class="severity severity-medium">중등도</span>
-                            <p>• 종골(발뒤꿈치) 골절<br>
-                            • 발목 관절 손상<br>
-                            • 족부 인대 파열</p>
+                            <h4>🔴 Up and Over 패턴</h4>
+                            <p>• 머리/목: 두개골 골절, 경추 손상, 뇌출혈<br>
+                            • 흉부: 늑골 골절, 기흉, 심장 좌상<br>
+                            • 복부: 간/비장 파열, 내출혈</p>
                         </div>
                         <div class="injury-item">
-                            <h4>🦵 에너지 전달 부위</h4>
-                            <span class="severity severity-low">경미</span>
-                            <p>• 경골/비골 골절 가능성<br>
-                            • 무릎 반월판 손상<br>
-                            • 대퇴부 타박상</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🏥 간호 중점사항</h4>
-                            <span class="severity severity-low">관찰</span>
-                            <p>• 하지 혈관 상태 확인<br>
-                            • 발가락 색깔, 온도 체크<br>
-                            • 통증 관리 및 고정</p>
+                            <h4>🟡 Down and Under 패턴</h4>
+                            <p>• 무릎: 슬개골 골절, 인대 파열<br>
+                            • 대퇴부: 대퇴골 간부 골절<br>
+                            • 고관절: 후방 탈구, 골반 골절</p>
                         </div>
                     </div>
-                    <p><strong>💡 예후:</strong> 적절한 치료 시 완전 회복 가능, 보행 기능 정상 회복 예상</p>
+                    <p><strong>💡 핵심:</strong> 안전벨트 착용 여부에 따라 손상 패턴이 달라지며, 속도가 높을수록 더 심각한 손상이 발생합니다.</p>
                 `
             },
-            'medium-feet': {
-                title: "🟡 중층 낙상 - 발부터 착지 (3-4층)",
-                height: 12,
-                speed: 49,
-                energy: 8232,
-                survival: 60,
-                startFloor: 4,
-                landingType: 'feet',
+            side: {
+                title: "↔️ 측면 충돌 (Side Impact)",
                 content: `
-                    <p><strong>🏗️ 시나리오:</strong> 4층 아파트(12m)에서 음주 후 발부터 추락한 30세 남성</p>
+                    <p><strong>발생 기전:</strong> 차량 측면에 충격이 가해지면서 승객이 충돌 방향으로 밀려나는 상황</p>
                     <div class="injury-list">
                         <div class="injury-item">
-                            <h4>🦶 하지 손상 (Don Juan Syndrome)</h4>
-                            <span class="severity severity-high">심각</span>
-                            <p>• 양측 종골 분쇄골절<br>
-                            • 경골/비골 개방성 골절<br>
-                            • 무릎/고관절 손상</p>
+                            <h4>🔴 직접 충격 손상</h4>
+                            <p>• 머리: 측두골 골절, 뇌출혈<br>
+                            • 흉부: 늑골 골절, 기흉<br>
+                            • 골반: 골반골 골절, 고관절 탈구</p>
                         </div>
                         <div class="injury-item">
-                            <h4>🦴 척추 손상</h4>
-                            <span class="severity severity-high">심각</span>
-                            <p>• L1-L2 압박골절<br>
-                            • 척수 손상 가능성<br>
-                            • 하반신 기능 장애</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🫀 내장기관 손상</h4>
-                            <span class="severity severity-medium">중등도</span>
-                            <p>• 간 열상 (우상복부 통증)<br>
-                            • 비장 타박 (좌상복부)<br>
-                            • 내출혈 가능성</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🚨 응급 처치</h4>
-                            <span class="severity severity-critical">최우선</span>
-                            <p>• 척추 고정 및 경추 보호<br>
-                            • 내출혈 모니터링<br>
-                            • 다발성 외상 프로토콜</p>
+                            <h4>🟡 내장기관 손상</h4>
+                            <p>• 간/비장: 늑골 압박으로 인한 파열<br>
+                            • 신장: 측면 압박 손상<br>
+                            • 폐: 기흉, 혈흉</p>
                         </div>
                     </div>
-                    <p><strong>⚠️ 주의:</strong> 생명 위험 구간 진입, 즉시 외상센터 이송 및 다학제 치료 필요</p>
+                    <p><strong>⚠️ 주의:</strong> 측면은 보호 구조가 약해 고속 충돌 시 매우 위험하며, 충돌 방향 쪽 집중적 손상이 특징입니다.</p>
                 `
             },
-            'high-feet': {
-                title: "🔴 고층 낙상 - 발부터 착지 (5층 이상)",
-                height: 18,
-                speed: 60,
-                energy: 12348,
-                survival: 20,
-                startFloor: 5,
-                landingType: 'feet',
+            rear: {
+                title: "⬅️ 후면 충돌 (Rear Impact)",
                 content: `
-                    <p><strong>🏗️ 시나리오:</strong> 6층 건물 옥상(18m)에서 자살 시도로 발부터 낙상한 28세 청년</p>
+                    <p><strong>발생 기전:</strong> 후방에서 충돌하면서 승객의 머리가 채찍처럼 뒤로 젖혀졌다가 앞으로 꺾이는 상황</p>
                     <div class="injury-list">
                         <div class="injury-item">
-                            <h4>🦶 하지 완전 파괴</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• 양측 종골 완전 분쇄<br>
-                            • 다발성 개방성 골절<br>
-                            • 혈관, 신경 손상</p>
+                            <h4>🔴 편타성 손상 (Whiplash)</h4>
+                            <p>• 1단계: 목 과신전 (뒤로 젖혀짐)<br>
+                            • 2단계: 목 과굴곡 (앞으로 꺾임)<br>
+                            • 결과: 경추 염좌, 근육/인대 손상</p>
                         </div>
                         <div class="injury-item">
-                            <h4>🦴 척추 폭발성 골절</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• L1, L2 폭발성 골절<br>
-                            • 척수 완전 손상<br>
-                            • 하반신 완전 마비</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🫀 다발성 장기 손상</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• 간 다발성 열상<br>
-                            • 비장 파열<br>
-                            • 신장 손상<br>
-                            • 대량 내출혈</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🚨 소생술</h4>
-                            <span class="severity severity-critical">즉시</span>
-                            <p>• 출혈성 쇼크 치료<br>
-                            • 응급 수술 준비<br>
-                            • 대량 수혈 프로토콜<br>
-                            • 가족 상담</p>
+                            <h4>🟡 기타 손상</h4>
+                            <p>• 요추: 좌석등받이 압박 손상<br>
+                            • 흉부: 안전벨트에 의한 늑골 골절<br>
+                            • 심리: PTSD, 운전 공포증</p>
                         </div>
                     </div>
-                    <p><strong>💀 예후:</strong> 극도로 불량, 생존 시에도 영구 장애 불가피</p>
+                    <p><strong>💡 특징:</strong> 즉시 증상이 나타나지 않고 24-48시간 후 증상이 악화되는 경우가 많습니다.</p>
                 `
             },
-            'medium-head': {
-                title: "🟣 머리부터 착지 - 극도 위험",
-                height: 12,
-                speed: 49,
-                energy: 8232,
-                survival: 5,
-                startFloor: 4,
-                landingType: 'head',
+            rollover: {
+                title: "🔄 전복 사고 (Rollover)",
                 content: `
-                    <p><strong>🏗️시나리오:</strong> 4층 건물 옥상(12m)에서 머리부터 떨어진 22세 대학생</p>
+                    <p><strong>발생 기전:</strong> 차량이 뒤집히거나 굴러가면서 승객이 차 안에서 여러 방향으로 충격을 받는 상황</p>
                     <div class="injury-list">
                         <div class="injury-item">
-                            <h4>🧠 뇌 손상</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• 두개골 기저부 골절<br>
-                            • 경막하/경막외 혈종<br>
-                            • 뇌좌상, 뇌부종<br>
-                            • 뇌척수액 누출</p>
+                            <h4>🔴 다발성 손상</h4>
+                            <p>• 머리: 반복적 충격으로 심각한 뇌외상<br>
+                            • 척추: 다방향 힘으로 복잡한 골절<br>
+                            • 사지: 여러 부위 골절과 탈구</p>
                         </div>
                         <div class="injury-item">
-                            <h4>🦴 경추 손상</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• C1-C2 골절/탈구<br>
-                            • 경추 불안정성<br>
-                            • 척수 완전 손상<br>
-                            • 호흡근 마비</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🫁 흉부 손상</h4>
-                            <span class="severity severity-critical">치명적</span>
-                            <p>• 대동맥 파열<br>
-                            • 양측 기흉<br>
-                            • 폐 좌상<br>
-                            • 다발성 늑골 골절</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🚨 응급 처치</h4>
-                            <span class="severity severity-critical">즉시</span>
-                            <p>• 기도 확보 (경추 보호)<br>
-                            • 인공호흡 시작<br>
-                            • 뇌압 조절<br>
-                            • 응급 신경외과 수술</p>
+                            <h4>🟡 특수 위험</h4>
+                            <p>• 차 밖 이탈: 압사 위험<br>
+                            • 지붕 압궤: 경추 압박골절<br>
+                            • 화재: 화상 위험</p>
                         </div>
                     </div>
-                    <p><strong>☠️ 예후:</strong> 거의 사망, 생존 시 식물인간 상태 또는 심각한 장애</p>
-                `
-            },
-            'medium-side': {
-                title: "🔵 옆으로 착지 - 측면 손상",
-                height: 9,
-                speed: 43,
-                energy: 6174,
-                survival: 75,
-                startFloor: 3,
-                landingType: 'side',
-                content: `
-                    <p><strong>🏗️ 시나리오:</strong> 3층 베란다(9m)에서 빨래를 널다가 왼쪽으로 떨어진 45세 여성</p>
-                    <div class="injury-list">
-                        <div class="injury-item">
-                            <h4>💪 상지 손상</h4>
-                            <span class="severity severity-medium">중등도</span>
-                            <p>• 왼팔 요골 골절<br>
-                            • 어깨 탈구<br>
-                            • 쇄골 골절<br>
-                            • 손목 골절</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🫁 흉부 손상</h4>
-                            <span class="severity severity-medium">중등도</span>
-                            <p>• 좌측 늑골 골절(5-7번)<br>
-                            • 기흉 가능성<br>
-                            • 폐 좌상<br>
-                            • 흉벽 타박상</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🦴 골반 손상</h4>
-                            <span class="severity severity-medium">중등도</span>
-                            <p>• 좌측 장골 골절<br>
-                            • 고관절 타박<br>
-                            • 골반 인대 손상</p>
-                        </div>
-                        <div class="injury-item">
-                            <h4>🫀 내장기관</h4>
-                            <span class="severity severity-low">경미</span>
-                            <p>• 비장 타박 (좌상복부)<br>
-                            • 신장 타박<br>
-                            • 내출혈 모니터링 필요</p>
-                        </div>
-                    </div>
-                    <p><strong>💡 특징:</strong> 한쪽 집중 손상, 반대편은 상대적으로 안전</p>
+                    <p><strong>⚠️ 최고 위험:</strong> 가장 예측하기 어렵고 다발성 손상 위험이 높아 체계적이고 신속한 전신 검사가 필요합니다.</p>
                 `
             }
         };
 
-        function showFall(height, landingType) {
-            const scenarioKey = `${height}-${landingType}`;
-            const scenario = fallScenarios[scenarioKey];
-            
-            if (!scenario) return;
+        function showCollision(type) {
+            // 모든 시뮬레이션 숨기기
+            document.querySelectorAll('#collision-svg > g').forEach(g => {
+                g.classList.add('hidden');
+            });
             
             // 모든 버튼 비활성화
             document.querySelectorAll('.btn').forEach(btn => {
                 btn.classList.remove('btn-active');
             });
             
-            // 클릭된 버튼 활성화
+            // 선택된 시뮬레이션 보이기
+            const selectedGroup = document.getElementById(type + '-collision');
+            if (selectedGroup) {
+                selectedGroup.classList.remove('hidden');
+                
+                // 애니메이션 효과
+                setTimeout(() => {
+                    const cars = selectedGroup.querySelectorAll('.car');
+                    const persons = selectedGroup.querySelectorAll('.person');
+                    const injuries = selectedGroup.querySelectorAll('.injury-zone');
+                    
+                    cars.forEach(car => car.classList.add('animate-shake'));
+                    persons.forEach(person => person.classList.add('animate-bounce'));
+                    
+                    setTimeout(() => {
+                        injuries.forEach(injury => {
+                            injury.style.opacity = '1';
+                        });
+                    }, 800);
+                    
+                    setTimeout(() => {
+                        cars.forEach(car => car.classList.remove('animate-shake'));
+                        persons.forEach(person => person.classList.remove('animate-bounce'));
+                    }, 1000);
+                }, 100);
+            }
+            
+            // 버튼 활성화
             event.target.classList.add('btn-active');
             
-            // 통계 업데이트
-            updateStats(scenario);
-            
-            // 애니메이션 시작
-            animateFall(scenario);
-            
             // 설명 업데이트
-            updateExplanation(scenario);
-        }
-
-        function updateStats(scenario) {
-            document.getElementById('height-value').textContent = scenario.height + 'm';
-            document.getElementById('speed-value').textContent = scenario.speed + 'km/h';
-            document.getElementById('energy-value').textContent = scenario.energy + 'J';
-            document.getElementById('survival-value').textContent = scenario.survival + '%';
-            
-            // 생존율에 따른 색상 변경
-            const survivalElement = document.getElementById('survival-value');
-            if (scenario.survival >= 80) {
-                survivalElement.style.color = '#2ecc71';
-            } else if (scenario.survival >= 50) {
-                survivalElement.style.color = '#f39c12';
-            } else {
-                survivalElement.style.color = '#e74c3c';
+            const explanation = document.getElementById('explanation');
+            if (explanations[type]) {
+                explanation.innerHTML = `
+                    <h3>${explanations[type].title}</h3>
+                    ${explanations[type].content}
+                `;
             }
         }
 
-        function animateFall(scenario) {
-            const person = document.getElementById('person');
-            const building = document.getElementById('building');
-            
-            // 초기 위치 설정
-            const startHeight = (scenario.startFloor - 1) * 60 + 30;
-            person.style.left = '130px';
-            person.style.bottom = startHeight + 'px';
-            person.style.transform = 'rotate(0deg)';
-            
-            // 건물 높이 조정
-            const floors = building.querySelectorAll('.floor');
-            floors.forEach((floor, index) => {
-                if (index < scenario.startFloor) {
-                    floor.style.display = 'block';
-                } else {
-                    floor.style.display = 'none';
-                }
-            });
-            
-            // 손상 지시자 숨기기
-            document.querySelectorAll('.injury-indicator').forEach(indicator => {
-                indicator.style.opacity = '0';
-            });
-            
-            // 낙하 애니메이션
-            setTimeout(() => {
-                person.style.left = '280px';
-                person.style.bottom = '40px';
-                
-                // 착지 자세에 따른 회전
-                if (scenario.landingType === 'head') {
-                    person.style.transform = 'rotate(180deg)';
-                } else if (scenario.landingType === 'side') {
-                    person.style.transform = 'rotate(90deg)';
-                } else {
-                    person.style.transform = 'rotate(0deg)';
-                }
-                
-                // 충격 후 손상 지시자 표시
-                setTimeout(() => {
-                    showInjuries(scenario);
-                }, 1500);
-                
-            }, 500);
-        }
-
-        function showInjuries(scenario) {
-            const injuryMapping = {
-                'low-feet': ['leg-injury'],
-                'medium-feet': ['leg-injury', 'spine-injury', 'organ-injury'],
-                'high-feet': ['leg-injury', 'spine-injury', 'organ-injury', 'head-injury'],
-                'medium-head': ['head-injury', 'spine-injury', 'organ-injury'],
-                'medium-side': ['leg-injury', 'organ-injury']
-            };
-            
-            const scenarioKey = `${scenario.startFloor <= 2 ? 'low' : scenario.startFloor <= 4 ? 'medium' : 'high'}-${scenario.landingType}`;
-            const injuries = injuryMapping[scenarioKey] || [];
-            
-            injuries.forEach((injuryId, index) => {
-                setTimeout(() => {
-                    const indicator = document.getElementById(injuryId);
-                    if (indicator) {
-                        indicator.style.opacity = '1';
-                    }
-                }, index * 300);
-            });
-            
-            // 에너지 전달 경로 표시
-            setTimeout(() => {
-                const energyPath = document.getElementById('energy-path');
-                energyPath.style.opacity = '0.7';
-                
-                setTimeout(() => {
-                    energyPath.style.opacity = '0';
-                }, 2000);
-            }, 1000);
-        }
-
-        function updateExplanation(scenario) {
-            const explanation = document.getElementById('explanation');
-            explanation.innerHTML = `
-                <h3>${scenario.title}</h3>
-                ${scenario.content}
-            `;
-        }
-
-        // 페이지 로드 시 기본 시나리오 표시
+        // 페이지 로드 시 정면 충돌을 기본으로 표시
         window.addEventListener('load', () => {
-            showFall('low', 'feet');
+            showCollision('front');
+            document.querySelector('.btn-front').classList.add('btn-active');
         });
     </script>
 </body>

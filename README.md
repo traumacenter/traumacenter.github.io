@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>외상의 기전 학습 가이드</title>
+    <title>Down and Under 패턴 교육 슬라이드</title>
     <style>
         * {
             margin: 0;
@@ -12,921 +12,862 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 10px;
-            margin: 0;
+            font-family: 'Malgun Gothic', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 1400px;
+        .presentation-container {
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            overflow: hidden;
-            width: 100%;
+            padding: 20px;
         }
 
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 20px;
             text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-size: 2.5em;
+            color: #e74c3c;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header p {
-            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-            opacity: 0.9;
-            margin: 0;
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #7f8c8d;
+            margin-bottom: 15px;
         }
 
-        .main-content {
-            padding: 20px;
+        .header .description {
+            font-size: 1em;
+            color: #34495e;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        /* 반응형 미디어 쿼리 */
-        @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            .header {
-                padding: 30px;
-            }
-            .main-content {
-                padding: 40px;
-            }
-        }
-
-        .mechanism-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .mechanism-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mechanism-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-
-        .mechanism-card.active {
-            border-color: #ff6b6b;
-            background: #fff5f5;
-        }
-
-        .card-icon {
-            width: 60px;
-            height: 60px;
-            background: #ff6b6b;
-            border-radius: 50%;
+        .slide-navigation {
             display: flex;
-            align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            font-size: 24px;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
-        .direct-impact { background: #ff6b6b; }
-        .indirect-impact { background: #4ecdc4; }
-        .deceleration { background: #45b7d1; }
-        .rotational { background: #f9ca24; }
-        .compression { background: #6c5ce7; }
-
-        .card-title {
-            font-size: 1.4em;
+        .slide-nav-btn {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #3498db;
+            color: #3498db;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 120px;
         }
 
-        .card-description {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
+        .slide-nav-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
         }
 
-        .detail-panel {
+        .slide-nav-btn.active {
+            background: #e74c3c;
+            border-color: #e74c3c;
+            color: white;
+            box-shadow: 0 5px 20px rgba(231,76,60,0.4);
+        }
+
+        .slide {
             display: none;
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-left: 5px solid #ff6b6b;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            min-height: 700px;
         }
 
-        .detail-panel.active {
+        .slide.active {
             display: block;
-            animation: slideDown 0.3s ease;
+            animation: slideIn 0.5s ease-out;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .detail-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
+        .slide-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px;
+            text-align: center;
         }
 
-        .detail-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 20px;
-            font-size: 20px;
-        }
-
-        .detail-title {
-            font-size: 1.8em;
+        .slide-title {
+            font-size: 2em;
             font-weight: bold;
-            color: #2c3e50;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .detail-content {
+        .slide-subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .slide-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-bottom: 25px;
+            padding: 30px;
+            align-items: center;
+            min-height: 500px;
         }
 
-        .clinical-example {
-            background: #e8f5e8;
+        .slide-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 15px;
             padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #27ae60;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .nursing-care {
-            background: #fff3cd;
+        .slide-description {
             padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #ffc107;
         }
 
-        .section-title {
-            font-weight: bold;
+        .slide-description h3 {
             color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
         }
 
-        .example-list {
+        .slide-description ul {
             list-style: none;
+            padding: 0;
         }
 
-        .example-list li {
-            margin-bottom: 8px;
-            padding-left: 20px;
+        .slide-description li {
+            margin-bottom: 15px;
+            padding-left: 25px;
             position: relative;
+            font-size: 1.1em;
+            line-height: 1.7;
         }
 
-        .example-list li:before {
-            content: "▶";
+        .slide-description li::before {
+            content: "▸";
             position: absolute;
             left: 0;
-            color: #27ae60;
+            color: #e74c3c;
             font-weight: bold;
+            font-size: 1.2em;
         }
 
-        .priority-box {
-            background: #ffebee;
-            border: 2px solid #e91e63;
-            border-radius: 10px;
+        .key-points {
+            background: #ecf0f1;
+            border-left: 5px solid #e74c3c;
             padding: 20px;
+            border-radius: 8px;
             margin-top: 20px;
         }
 
-        .priority-title {
-            color: #e91e63;
-            font-weight: bold;
+        .key-points h4 {
+            color: #e74c3c;
             margin-bottom: 10px;
             font-size: 1.1em;
         }
 
-        .traffic-accident {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
+        /* SVG Visuals */
+        .visual-svg {
+            width: 100%;
+            max-width: 450px;
+            height: 350px;
         }
 
-        .traffic-title {
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-            margin-bottom: 20px;
-            text-align: center;
-            line-height: 1.3;
+        /* Slide-specific styles */
+        .speed-indicator {
+            font-size: 1.2em;
+            font-weight: bold;
+            fill: #e74c3c;
         }
 
-        .accident-types {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+        .trajectory-line {
+            stroke-width: 4;
+            stroke-dasharray: 5,5;
+            opacity: 0.8;
         }
 
-        .accident-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-height: 120px;
+        .impact-effect {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .energy-flow {
+            animation: energyMove 3s ease-in-out infinite;
+        }
+
+        @keyframes energyMove {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .controls {
             display: flex;
-            flex-direction: column;
             justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .accident-card:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.02);
+        .control-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        .accident-card.active {
-            background: rgba(255,255,255,0.3);
-            border: 2px solid #fff;
-            transform: scale(1.02);
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52,152,219,0.4);
         }
 
-        .accident-icon {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: 10px;
+        .print-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
         }
 
-        .accident-card h3 {
-            margin: 8px 0;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        .print-btn:hover {
+            box-shadow: 0 5px 15px rgba(46,204,113,0.4);
         }
 
-        .accident-card p {
-            margin: 0;
-            font-size: clamp(0.75rem, 2vw, 0.9rem);
-            opacity: 0.9;
-            line-height: 1.3;
-        }
-
-        /* 모바일에서 2열, 태블릿 이상에서 4열 */
-        @media (max-width: 767px) {
-            .accident-types {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
             }
             
-            .accident-card {
-                padding: 12px;
-                min-height: 100px;
+            .slide-navigation,
+            .controls {
+                display: none;
+            }
+            
+            .slide {
+                display: block !important;
+                page-break-after: always;
+                box-shadow: none;
+                border: 2px solid #ddd;
+                margin-bottom: 0;
+            }
+            
+            .slide:last-child {
+                page-break-after: avoid;
             }
         }
 
-        @media (min-width: 768px) {
-            .traffic-accident {
-                padding: 30px;
-                margin: 40px 0;
-            }
-            
-            .accident-types {
-                grid-template-columns: repeat(4, 1fr);
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .slide-content {
+                grid-template-columns: 1fr;
                 gap: 20px;
             }
             
-            .accident-card {
-                padding: 20px;
-                min-height: 140px;
+            .slide-visual {
+                order: 1;
             }
             
-            .accident-card:hover {
-                transform: scale(1.05);
+            .slide-description {
+                order: 2;
             }
             
-            .accident-card.active {
-                transform: scale(1.05);
-            }
-        }
-
-        .reference-note {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            color: #6c757d;
-            font-size: clamp(0.8rem, 2vw, 0.95rem);
-            line-height: 1.5;
-        }
-
-        .btn-reset {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 20px auto;
-            display: block;
-            font-size: clamp(0.85rem, 2vw, 1rem);
-            min-width: 160px;
-        }
-
-        .btn-reset:hover {
-            background: #495057;
-            transform: scale(1.05);
-        }
-
-        /* 제목 스타일 반응형 */
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
-            line-height: 1.3;
-            padding: 0 10px;
-        }
-
-        /* 터치 디바이스 최적화 */
-        @media (max-width: 767px) {
-            .mechanism-card, .accident-card {
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            .slide-nav-btn {
+                min-width: 100px;
+                font-size: 12px;
+                padding: 10px 15px;
             }
             
-            .reference-note {
-                padding: 12px;
-                margin-top: 15px;
-            }
-            
-            .btn-reset {
-                padding: 10px 20px;
-                margin: 15px auto;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .reference-note {
-                padding: 20px;
-                margin-top: 30px;
-            }
-            
-            h2 {
-                margin-bottom: 30px;
-                padding: 0;
-            }
-        }
-
-        /* 고해상도 디스플레이 최적화 */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
             .header h1 {
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            }
-        }
-
-        /* 가로 모드 모바일 최적화 */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .header {
-                padding: 15px;
-            }
-            
-            .main-content {
-                padding: 15px;
-            }
-            
-            .mechanism-card {
-                min-height: 140px;
+                font-size: 2em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="presentation-container">
         <div class="header">
-            <h1>🩺 외상의 기전 학습 가이드</h1>
-            <p>학생간호사 & 신규간호사를 위한 인터렉티브 매뉴얼</p>
+            <h1>Down and Under 패턴</h1>
+            <div class="subtitle">정면충돌 손상기전 교육자료</div>
+            <div class="description">
+                안전벨트 미착용 시 발생하는 특징적인 손상 메커니즘을 단계별로 분석합니다. 
+                의료진 교육 및 교통안전 교육에 활용할 수 있도록 구성되었습니다.
+            </div>
         </div>
 
-        <div class="main-content">
-            <h2 style="color: #2c3e50; margin-bottom: 30px; text-align: center;">💡 외상 기전별 분류 (카드를 클릭하세요!)</h2>
-            
-            <div class="mechanism-grid">
-                <div class="mechanism-card" data-mechanism="direct">
-                    <div class="card-icon direct-impact">🎯</div>
-                    <div class="card-title">직접 충격 (Direct Impact)</div>
-                    <div class="card-description">물체가 직접 신체에 충돌하여 발생하는 손상</div>
-                </div>
+        <div class="slide-navigation">
+            <button class="slide-nav-btn active" onclick="showSlide(0)">1. 차량 급제동</button>
+            <button class="slide-nav-btn" onclick="showSlide(1)">2. Down 움직임</button>
+            <button class="slide-nav-btn" onclick="showSlide(2)">3. Under 움직임</button>
+            <button class="slide-nav-btn" onclick="showSlide(3)">4. 무릎 충돌</button>
+            <button class="slide-nav-btn" onclick="showSlide(4)">5. 에너지 전달</button>
+            <button class="slide-nav-btn" onclick="showSlide(5)">6. 상체 손상</button>
+        </div>
 
-                <div class="mechanism-card" data-mechanism="indirect">
-                    <div class="card-icon indirect-impact">🌊</div>
-                    <div class="card-title">간접 충격 (Indirect Impact)</div>
-                    <div class="card-description">충격이 골격계를 따라 전달되어 다른 부위에서 발생하는 손상</div>
-                </div>
-
-                <div class="mechanism-card" data-mechanism="deceleration">
-                    <div class="card-icon deceleration">⚡</div>
-                    <div class="card-title">감속 손상 (Deceleration)</div>
-                    <div class="card-description">급작스러운 속도 변화로 인한 내부 장기 손상</div>
-                </div>
-
-                <div class="mechanism-card" data-mechanism="rotational">
-                    <div class="card-icon rotational">🌀</div>
-                    <div class="card-title">회전 손상 (Rotational)</div>
-                    <div class="card-description">회전력에 의한 나선형 골절과 인대 파열</div>
-                </div>
-
-                <div class="mechanism-card" data-mechanism="compression">
-                    <div class="card-icon compression">🗜️</div>
-                    <div class="card-title">압축 손상 (Compression)</div>
-                    <div class="card-description">두 개의 힘이 서로 반대 방향에서 조직을 압축</div>
-                </div>
+        <!-- 슬라이드 1: 차량 급제동 -->
+        <div class="slide active" id="slide-0">
+            <div class="slide-header">
+                <div class="slide-title">1단계: 차량 급제동</div>
+                <div class="slide-subtitle">Sudden Braking</div>
             </div>
-
-            <!-- 상세 정보 패널들 -->
-            <div id="direct-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon direct-impact">🎯</div>
-                    <div class="detail-title">직접 충격 (Direct Impact)</div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Road -->
+                        <rect x="0" y="250" width="450" height="100" fill="#4a4a4a"/>
+                        <rect x="0" y="290" width="450" height="4" fill="#fff" opacity="0.8"/>
+                        
+                        <!-- Car exterior -->
+                        <rect x="150" y="180" width="200" height="70" rx="15" fill="#2c5aa0"/>
+                        <rect x="170" y="190" width="160" height="35" rx="8" fill="#87ceeb" opacity="0.7"/>
+                        
+                        <!-- Wheels -->
+                        <circle cx="180" cy="260" r="20" fill="#1a1a1a"/>
+                        <circle cx="320" cy="260" r="20" fill="#1a1a1a"/>
+                        
+                        <!-- Brake lights -->
+                        <rect x="340" y="200" width="8" height="25" rx="4" fill="#ff0000" class="impact-effect"/>
+                        
+                        <!-- Tire marks -->
+                        <rect x="50" y="265" width="120" height="4" fill="#333" opacity="0.8"/>
+                        <rect x="50" y="275" width="120" height="4" fill="#333" opacity="0.8"/>
+                        
+                        <!-- Speed indicators -->
+                        <text x="100" y="150" class="speed-indicator">60km/h</text>
+                        <text x="300" y="150" class="speed-indicator">0km/h</text>
+                        <line x1="140" y1="155" x2="260" y2="155" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Inertia force arrow -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+                            </marker>
+                        </defs>
+                        <line x1="250" y1="220" x2="320" y2="220" stroke="#e74c3c" stroke-width="4" marker-end="url(#arrowhead)"/>
+                        <text x="280" y="240" fill="#e74c3c" font-weight="bold" font-size="14">관성력</text>
+                        
+                        <!-- Impact label -->
+                        <text x="375" y="195" fill="#ff0000" font-weight="bold" font-size="12">브레이크등</text>
+                        <text x="30" y="290" fill="#333" font-weight="bold" font-size="12">스키드 마크</text>
+                    </svg>
                 </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 임상 예시</div>
-                        <ul class="example-list">
-                            <li><strong>야구공에 맞은 경우:</strong> 타박상, 혈종, 국소 골절</li>
-                            <li><strong>주먹으로 맞은 경우:</strong> 안와 골절, 비골 골절</li>
-                            <li><strong>벽에 머리를 부딪힌 경우:</strong> 두피 열상, 뇌진탕</li>
-                            <li><strong>무릎을 바닥에 부딪힌 경우:</strong> 슬개골 골절, 연부조직 손상</li>
-                        </ul>
-                    </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 간호 주의점</div>
-                        <ul class="example-list">
-                            <li>충돌 부위 주변의 숨겨진 손상 확인</li>
-                            <li>신경혈관 손상 여부 사정</li>
-                            <li>부종과 통증 정도 평가</li>
-                            <li>국소 손상과 에너지 전달 경로 동시 사정</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">충돌 지점에서 최대 에너지가 집중되므로 국소적 손상이 주요 특징입니다.</span>
-                </div>
-            </div>
-
-            <div id="indirect-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon indirect-impact">🌊</div>
-                    <div class="detail-title">간접 충격 (Indirect Impact)</div>
-                </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 임상 예시</div>
-                        <ul class="example-list">
-                            <li><strong>발목 골절 시:</strong> 에너지가 상행하여 경골/비골 골절, 무릎 인대 손상</li>
-                            <li><strong>손목 골절 시:</strong> 요골/척골 골절, 팔꿈치 관절 손상</li>
-                            <li><strong>꼬리뼈 낙상 시:</strong> 척추 압박골절, 경추 과신전 손상</li>
-                            <li><strong>발뒤꿈치 착지 시:</strong> 종골 골절 → 경골/비골 골절</li>
-                        </ul>
-                    </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 간호 주의점</div>
-                        <ul class="example-list">
-                            <li>명백한 손상 부위뿐만 아니라 에너지 전달 경로상의 모든 부위 사정</li>
-                            <li>통증 호소가 없어도 체계적 검사 필요</li>
-                            <li>지연성 증상 발현 가능성 설명</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">에너지 전달 경로 상의 모든 부위 사정이 최우선입니다.</span>
-                </div>
-            </div>
-
-            <div id="deceleration-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon deceleration">⚡</div>
-                    <div class="detail-title">감속 손상 (Deceleration Injury)</div>
-                </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 임상 예시</div>
-                        <ul class="example-list">
-                            <li><strong>대동맥 파열:</strong> 대동맥궁 ligamentum arteriosum 부근</li>
-                            <li><strong>심장 좌상:</strong> 심장이 흉벽에 충돌</li>
-                            <li><strong>미만성 축삭 손상:</strong> 뇌조직의 다른 밀도로 인한 전단손상</li>
-                            <li><strong>경막하 혈종:</strong> 뇌와 두개골의 속도 차이</li>
-                        </ul>
-                    </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 간호 주의점</div>
-                        <ul class="example-list">
-                            <li>초기에는 증상이 미미할 수 있음</li>
-                            <li>24-48시간 집중 관찰 필요</li>
-                            <li>활력징후 변화와 신경학적 변화 모니터링</li>
-                            <li>내출혈 징후 관찰 (혈압 저하, 빈맥, 복부 팽만)</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">내출혈 모니터링이 최우선입니다!</span>
-                </div>
-            </div>
-
-            <div id="rotational-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon rotational">🌀</div>
-                    <div class="detail-title">회전 손상 (Rotational Injury)</div>
-                </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 임상 예시</div>
-                        <ul class="example-list">
-                            <li><strong>나선형 골절:</strong> 경골/비골의 나선형 골절 (스키 사고)</li>
-                            <li><strong>인대 파열:</strong> 전십자인대(ACL) 파열</li>
-                            <li><strong>미만성 축삭 손상:</strong> 뇌간과 대뇌의 회전 속도 차이</li>
-                            <li><strong>장간막 파열:</strong> 소장이 회전하면서 장간막 혈관 손상</li>
-                        </ul>
-                    </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 간호 주의점</div>
-                        <ul class="example-list">
-                            <li>신경혈관 손상 동반 가능성 높음</li>
-                            <li>원위부 감각, 운동, 순환 상태 정기적 사정</li>
-                            <li>구획증후군 발생 주의</li>
-                            <li>지연성 신경 증상 관찰</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">신경혈관 상태 집중 관찰이 필수입니다!</span>
-                </div>
-            </div>
-
-            <div id="compression-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon compression">🗜️</div>
-                    <div class="detail-title">압축 손상 (Compression Injury)</div>
-                </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 임상 예시</div>
-                        <ul class="example-list">
-                            <li><strong>척추 압박골절:</strong> 수직 압축력으로 인한 척추체 붕괴</li>
-                            <li><strong>간 파열:</strong> 우상복부 압박으로 인한 간 피막 파열</li>
-                            <li><strong>구획증후군:</strong> 근육 구획 내 압력 증가</li>
-                        </ul>
-                    </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 간호 주의점</div>
-                        <ul class="example-list">
-                            <li>압박 해제 후에도 지속적인 관찰 필요</li>
-                            <li>재관류 손상 가능성</li>
-                            <li>횡문근융해증 발생 주의</li>
-                            <li><strong>전해질 불균형 모니터링 (특히 칼륨 수치)</strong></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">구획증후군과 재관류 손상 주의! 전해질 모니터링 중요!</span>
-                </div>
-            </div>
-
-            <!-- 교통사고 손상 기전 -->
-            <div class="traffic-accident">
-                <div class="traffic-title">🚗 교통사고 손상 기전</div>
-                <div class="accident-types">
-                    <div class="accident-card" data-traffic="frontal">
-                        <div class="accident-icon">🎯</div>
-                        <h3>정면 충돌</h3>
-                        <p>Down & Under / Up & Over 패턴</p>
-                    </div>
-                    <div class="accident-card" data-traffic="side">
-                        <div class="accident-icon">↔️</div>
-                        <h3>측면 충돌</h3>
-                        <p>T-bone 사고, 측면 압박</p>
-                    </div>
-                    <div class="accident-card" data-traffic="rear">
-                        <div class="accident-icon">⬅️</div>
-                        <h3>후면 충돌</h3>
-                        <p>편타성 손상 (Whiplash)</p>
-                    </div>
-                    <div class="accident-card" data-traffic="rollover">
-                        <div class="accident-icon">🔄</div>
-                        <h3>전복 사고</h3>
-                        <p>다발성 손상, 예측 불가</p>
+                <div class="slide-description">
+                    <h3>물리적 상황 분석</h3>
+                    <ul>
+                        <li>차량이 정면 충돌하며 순간적으로 정지합니다 (예: 60km/h → 0)</li>
+                        <li>브레이크등이 깜빡이고, 타이어는 스키드 마크를 남깁니다</li>
+                        <li>이 순간, 탑승자에게 체중의 30~50배에 달하는 관성력이 작용합니다</li>
+                        <li>차량은 멈추지만 승객의 몸은 계속 전진하려는 힘을 받습니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>⚠️ 핵심 포인트</h4>
+                        <p>뉴턴 제1법칙(관성의 법칙): 움직이던 물체는 외부 힘이 없으면 계속 움직이려 함</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 교통사고 상세 패널들 -->
-            <div id="frontal-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon" style="background: #e74c3c;">🎯</div>
-                    <div class="detail-title">정면 충돌 (Frontal Collision)</div>
+        <!-- 슬라이드 2: Down 움직임 시작 -->
+        <div class="slide" id="slide-1">
+            <div class="slide-header">
+                <div class="slide-title">2단계: Down 움직임 시작</div>
+                <div class="slide-subtitle">하향 이동 시작</div>
+            </div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Car interior frame -->
+                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
+                        
+                        <!-- Seat -->
+                        <rect x="80" y="180" width="80" height="100" rx="10" fill="#2a2a2a"/>
+                        <rect x="85" y="185" width="70" height="80" rx="8" fill="#444"/>
+                        
+                        <!-- Dashboard -->
+                        <path d="M 300 120 Q 340 120 340 160 L 340 220 L 300 220 Z" fill="#2a2a2a"/>
+                        
+                        <!-- Passenger (initial position - dotted) -->
+                        <g stroke="#bbb" stroke-width="2" fill="none" stroke-dasharray="3,3" opacity="0.4">
+                            <circle cx="140" cy="140" r="15"/>
+                            <rect x="125" y="155" width="30" height="50" rx="5"/>
+                            <rect x="120" y="205" width="12" height="40" rx="6"/>
+                            <rect x="148" y="205" width="12" height="40" rx="6"/>
+                        </g>
+                        
+                        <!-- Passenger (moved position) -->
+                        <g fill="#d4a574">
+                            <circle cx="140" cy="160" r="15"/>
+                            <rect x="125" y="175" width="30" height="50" rx="5" fill="#3498db"/>
+                            <rect x="120" y="225" width="12" height="40" rx="6" fill="#1a365d"/>
+                            <rect x="148" y="225" width="12" height="40" rx="6" fill="#1a365d"/>
+                        </g>
+                        
+                        <!-- Down trajectory -->
+                        <line x1="140" y1="100" x2="140" y2="200" stroke="#ffd700" stroke-width="4" class="trajectory-line"/>
+                        <text x="150" y="150" fill="#ffd700" font-weight="bold" font-size="14">DOWN</text>
+                        
+                        <!-- Force arrows -->
+                        <defs>
+                            <marker id="yellowArrow" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#ffd700"/>
+                            </marker>
+                        </defs>
+                        <line x1="100" y1="140" x2="100" y2="180" stroke="#ffd700" stroke-width="3" marker-end="url(#yellowArrow)"/>
+                        <text x="60" y="160" fill="#ffd700" font-weight="bold" font-size="12">중력+관성</text>
+                        
+                        <!-- No seatbelt indicator -->
+                        <text x="200" y="140" fill="#e74c3c" font-weight="bold" font-size="16">⚠️ 안전벨트 미착용</text>
+                    </svg>
                 </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px;">
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 10px; border-left: 4px solid #ffc107;">
-                        <div class="section-title">🔽 Down and Under 패턴</div>
-                        <p style="margin-bottom: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>발생순서:</strong></p>
-                        <ul class="example-list">
-                            <li>차량 급정지 → 몸이 앞으로 밀림</li>
-                            <li>무릎이 대시보드 충돌</li>
-                            <li>에너지가 다리를 따라 전달</li>
-                            <li>상체가 계속 앞으로 움직임</li>
-                        </ul>
-                        <p style="margin-top: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>예상손상:</strong></p>
-                        <ul class="example-list">
-                            <li>슬개골 골절, 무릎 인대 파열</li>
-                            <li>대퇴골 간부 골절</li>
-                            <li>고관절 후방 탈구</li>
-                            <li>골반골 골절</li>
-                        </ul>
+                <div class="slide-description">
+                    <h3>Down 움직임 메커니즘</h3>
+                    <ul>
+                        <li>안전벨트를 착용하지 않은 승객은 상체를 제어하지 못합니다</li>
+                        <li>중력과 관성이 함께 작용하며 몸이 아래로 미끄러지기 시작합니다</li>
+                        <li>좌석 표면에서 승객이 하향으로 슬라이딩하는 현상이 발생합니다</li>
+                        <li>노란색 수직 궤적선을 통해 Down 방향을 시각화합니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>🔍 중요 관찰 포인트</h4>
+                        <p>안전벨트가 있었다면 상체가 고정되어 이런 하향 이동이 방지되었을 것입니다</p>
                     </div>
-                    
-                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; border-left: 4px solid #27ae60;">
-                        <div class="section-title">🔼 Up and Over 패턴</div>
-                        <p style="margin-bottom: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>발생순서:</strong></p>
-                        <ul class="example-list">
-                            <li>차량 급정지 → 관성으로 몸이 앞으로</li>
-                            <li>머리/가슴이 충돌</li>
-                            <li>목이 과도하게 굽어짐</li>
-                            <li>내장기관도 앞으로 밀림</li>
-                        </ul>
-                        <p style="margin-top: 12px; font-size: clamp(0.85rem, 2vw, 0.95rem);"><strong>예상손상:</strong></p>
-                        <ul class="example-list">
-                            <li>두개골 골절, 뇌출혈, 뇌진탕</li>
-                            <li>경추 골절, 척수 손상</li>
-                            <li>늑골 골절, 기흉, 혈흉</li>
-                            <li>간, 비장, 신장 파열</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- 태블릿 이상에서 2열 레이아웃 -->
-                <style>
-                @media (min-width: 768px) {
-                    #frontal-detail > div:nth-child(2) {
-                        grid-template-columns: 1fr 1fr !important;
-                        gap: 25px !important;
-                        margin-bottom: 25px !important;
-                    }
-                    
-                    #frontal-detail .section-title + p {
-                        margin-bottom: 15px !important;
-                    }
-                    
-                    #frontal-detail .example-list + p {
-                        margin-top: 15px !important;
-                    }
-                    
-                    #frontal-detail > div:nth-child(2) > div {
-                        padding: 20px !important;
-                    }
-                }
-                </style>
-                
-                <div class="priority-box">
-                    <div class="priority-title">🚨 간호 우선순위</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">Down & Under: 골반 골절로 인한 내출혈 주의 | Up & Over: 기도 확보 및 경추 고정이 최우선!</span>
                 </div>
             </div>
+        </div>
 
-            <div id="side-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon" style="background: #9b59b6;">↔️</div>
-                    <div class="detail-title">측면 충돌 (Side Impact)</div>
+        <!-- 슬라이드 3: Under 움직임 -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <div class="slide-title">3단계: Under 움직임</div>
+                <div class="slide-subtitle">대시보드 하부로 향하는 복합 궤적</div>
+            </div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Car interior -->
+                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
+                        
+                        <!-- Dashboard -->
+                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
+                        
+                        <!-- Seat -->
+                        <rect x="80" y="180" width="80" height="100" rx="10" fill="#2a2a2a"/>
+                        
+                        <!-- Passenger in forward position -->
+                        <g fill="#d4a574">
+                            <circle cx="180" cy="180" r="15"/>
+                            <rect x="165" y="195" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-10 180 220)"/>
+                            <rect x="160" y="245" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-5 166 265)"/>
+                            <rect x="188" y="245" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-5 194 265)"/>
+                        </g>
+                        
+                        <!-- Complex trajectory (Down + Under) -->
+                        <path d="M 140 140 Q 160 160 180 180 Q 220 200 260 240" stroke="#ffd700" stroke-width="4" fill="none" class="trajectory-line"/>
+                        
+                        <!-- Horizontal trajectory -->
+                        <line x1="180" y1="240" x2="280" y2="240" stroke="#ff6600" stroke-width="4" class="trajectory-line"/>
+                        
+                        <!-- Labels -->
+                        <text x="120" y="170" fill="#ffd700" font-weight="bold" font-size="12">DOWN</text>
+                        <text x="220" y="230" fill="#ff6600" font-weight="bold" font-size="12">UNDER</text>
+                        
+                        <!-- Combined vector arrow -->
+                        <defs>
+                            <marker id="redArrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+                            </marker>
+                        </defs>
+                        <line x1="140" y1="140" x2="260" y2="240" stroke="#e74c3c" stroke-width="3" marker-end="url(#redArrow)"/>
+                        
+                        <!-- Formula -->
+                        <text x="200" y="120" fill="#e74c3c" font-weight="bold" font-size="14">Down + Under = 복합 충돌 경로</text>
+                        
+                        <!-- Target area -->
+                        <ellipse cx="290" cy="250" rx="30" ry="20" fill="#ff3333" opacity="0.3"/>
+                        <text x="270" y="280" fill="#ff3333" font-weight="bold" font-size="12">충돌 목표점</text>
+                    </svg>
                 </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 발생 과정</div>
-                        <ul class="example-list">
-                            <li><strong>1단계:</strong> 측면 충격</li>
-                            <li><strong>2단계:</strong> 차체 변형</li>
-                            <li><strong>3단계:</strong> 승객이 충돌 방향으로 밀림</li>
-                            <li><strong>4단계:</strong> 머리, 어깨, 골반이 차체와 충돌</li>
-                            <li><strong>5단계:</strong> 반대편으로 튕겨나감</li>
-                        </ul>
+                <div class="slide-description">
+                    <h3>Under 움직임 분석</h3>
+                    <ul>
+                        <li>관성에 의해 승객은 대시보드 아래 방향으로 이동합니다</li>
+                        <li>Down(수직) + Under(수평)의 복합 궤적을 따라 움직입니다</li>
+                        <li>수평 방향 궤적선으로 Under 경로를 강조합니다</li>
+                        <li>최종적으로 대시보드 하단부를 향한 복합 벡터가 형성됩니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>📐 물리학적 분석</h4>
+                        <p><strong>수직 성분:</strong> 중력 + 좌석 미끄러짐<br>
+                        <strong>수평 성분:</strong> 전방 관성력<br>
+                        <strong>합성 벡터:</strong> 대시보드 하단부 충돌 경로</p>
                     </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 예상 손상</div>
-                        <ul class="example-list">
-                            <li><strong>직접 충격:</strong> 측두골 골절, 뇌출혈</li>
-                            <li><strong>어깨:</strong> 쇄골 골절, 어깨 탈구</li>
-                            <li><strong>흉부:</strong> 늑골 골절(여러 개), 기흉</li>
-                            <li><strong>골반:</strong> 골반골 골절, 고관절 탈구</li>
-                            <li><strong>내장기관:</strong> 간/비장 파열, 신장 손상</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 왜 측면 충돌이 위험한가?</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">측면은 정면/후면보다 보호 구조가 약하고, 문과 승객 사이 거리가 가까워(30-40cm) 충격을 흡수할 공간이 부족합니다.</span>
                 </div>
             </div>
+        </div>
 
-            <div id="rear-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon" style="background: #3498db;">⬅️</div>
-                    <div class="detail-title">후면 충돌 (Rear Impact) - Whiplash</div>
+        <!-- 슬라이드 4: 무릎 충돌 -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <div class="slide-title">4단계: 무릎 충돌</div>
+                <div class="slide-subtitle">Knee Impact - 1차 손상 발생</div>
+            </div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Car interior -->
+                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
+                        
+                        <!-- Dashboard -->
+                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
+                        
+                        <!-- Passenger -->
+                        <g fill="#d4a574">
+                            <circle cx="200" cy="160" r="15"/>
+                            <rect x="185" y="175" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-15 200 200)"/>
+                            <rect x="180" y="225" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-10 186 245)"/>
+                            <rect x="208" y="225" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-10 214 245)"/>
+                        </g>
+                        
+                        <!-- Knee impact points -->
+                        <circle cx="290" cy="260" r="8" fill="#ff6b6b" class="impact-effect"/>
+                        <circle cx="295" cy="265" r="8" fill="#ff6b6b" class="impact-effect"/>
+                        
+                        <!-- Impact shockwave -->
+                        <circle cx="292" cy="262" r="20" fill="none" stroke="#ff3333" stroke-width="3" class="impact-effect"/>
+                        <circle cx="292" cy="262" r="35" fill="none" stroke="#ff6666" stroke-width="2" opacity="0.6" class="impact-effect"/>
+                        
+                        <!-- Impact force arrow -->
+                        <line x1="250" y1="262" x2="285" y2="262" stroke="#ff3333" stroke-width="5" marker-end="url(#redArrow)"/>
+                        <text x="220" y="250" fill="#ff3333" font-weight="bold" font-size="14">충격력</text>
+                        
+                        <!-- Damage labels -->
+                        <text x="310" y="250" fill="#e74c3c" font-weight="bold" font-size="12">1차 손상:</text>
+                        <text x="310" y="265" fill="#e74c3c" font-size="11">• 슬개골 골절</text>
+                        <text x="310" y="280" fill="#e74c3c" font-size="11">• 대퇴골 원위부 골절</text>
+                        <text x="310" y="295" fill="#e74c3c" font-size="11">• 인대 손상</text>
+                        
+                        <!-- Force magnitude indicator -->
+                        <rect x="350" y="140" width="80" height="25" fill="#ff3333" opacity="0.3" rx="5"/>
+                        <text x="355" y="157" fill="#ff3333" font-weight="bold" font-size="12">고에너지 충격</text>
+                    </svg>
                 </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 편타성 손상 과정</div>
-                        <ul class="example-list">
-                            <li><strong>1단계:</strong> 후면 충격 → 차량이 앞으로 밀림</li>
-                            <li><strong>2단계:</strong> 좌석이 승객을 앞으로 밀어냄</li>
-                            <li><strong>3단계:</strong> 머리만 뒤에 남아있음</li>
-                            <li><strong>4단계:</strong> 목이 과도하게 뒤로 젖혀짐 (과신전)</li>
-                            <li><strong>5단계:</strong> 반동으로 앞으로 꺾임 (과굴곡)</li>
-                        </ul>
+                <div class="slide-description">
+                    <h3>무릎 충돌 메커니즘</h3>
+                    <ul>
+                        <li>무릎이 대시보드 하단부에 강하게 충돌합니다</li>
+                        <li>슬개골 골절, 대퇴골 원위부 골절 등 하체 손상이 발생할 수 있습니다</li>
+                        <li>충격 포인트에 시각적 파동 애니메이션이 강조됩니다</li>
+                        <li>이때 발생하는 에너지는 다음 단계의 연쇄 손상을 유발합니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>🦴 주요 손상 패턴</h4>
+                        <p><strong>슬개골 골절:</strong> 직접적인 충돌 손상<br>
+                        <strong>대퇴골 골절:</strong> 축 방향 압축력<br>
+                        <strong>인대 손상:</strong> 과도한 굴곡과 압박</p>
                     </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 경추 손상 특징</div>
-                        <ul class="example-list">
-                            <li><strong>과신전 단계:</strong> 목 앞쪽 근육, 인대 손상</li>
-                            <li><strong>과굴곡 단계:</strong> 목 뒤쪽 근육, 인대 손상</li>
-                            <li><strong>기타 손상:</strong> 요추 손상, 흉부 손상</li>
-                            <li><strong>심리적:</strong> PTSD, 운전 공포증</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 왜 목 손상이 주로 생길까?</div>
-                    머리 무게 약 4-5kg(볼링공 정도)을 가느다란 목 구조가 지탱하므로, 갑작스러운 가속-감속에 가장 취약합니다.
                 </div>
             </div>
+        </div>
 
-            <div id="rollover-detail" class="detail-panel">
-                <div class="detail-header">
-                    <div class="detail-icon" style="background: #e67e22;">🔄</div>
-                    <div class="detail-title">전복 사고 (Rollover)</div>
+        <!-- 슬라이드 5: 에너지 전달 -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <div class="slide-title">5단계: 에너지 전달</div>
+                <div class="slide-subtitle">Energy Transfer - 연쇄 손상</div>
+            </div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Car interior outline -->
+                        <rect x="50" y="100" width="350" height="200" rx="15" fill="none" stroke="#555" stroke-width="1" opacity="0.3"/>
+                        
+                        <!-- Human figure (X-ray style) -->
+                        <g fill="none" stroke="#87ceeb" stroke-width="2" opacity="0.6">
+                            <circle cx="200" cy="140" r="18"/>
+                            <rect x="180" y="160" width="40" height="60" rx="8"/>
+                            <rect x="185" y="220" width="30" height="20" rx="5"/>
+                        </g>
+                        
+                        <!-- Bone structure -->
+                        <g stroke="#fff" stroke-width="4" opacity="0.8">
+                            <!-- Femur bones -->
+                            <line x1="188" y1="230" x2="188" y2="280" stroke="#ff6666"/>
+                            <line x1="212" y1="230" x2="212" y2="280" stroke="#ff6666"/>
+                            <!-- Tibia bones -->
+                            <line x1="188" y1="280" x2="188" y2="320" stroke="#ff6666"/>
+                            <line x1="212" y1="280" x2="212" y2="320" stroke="#ff6666"/>
+                            <!-- Pelvis -->
+                            <ellipse cx="200" cy="220" rx="25" ry="10" stroke="#ff6666"/>
+                            <!-- Spine -->
+                            <line x1="200" y1="160" x2="200" y2="210" stroke="#ff6666"/>
+                        </g>
+                        
+                        <!-- Energy flow animation -->
+                        <g class="energy-flow">
+                            <circle cx="190" cy="320" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="300" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="280" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="260" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="240" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="220" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="200" r="4" fill="#ff3333"/>
+                            <circle cx="190" cy="180" r="4" fill="#ff3333"/>
+                        </g>
+                        
+                        <!-- Energy pathway arrows -->
+                        <defs>
+                            <marker id="energyArrow" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#ff3333"/>
+                            </marker>
+                        </defs>
+                        <line x1="210" y1="320" x2="210" y2="180" stroke="#ff3333" stroke-width="3" marker-end="url(#energyArrow)"/>
+                        
+                        <!-- Anatomical labels -->
+                        <text x="250" y="180" fill="#e74c3c" font-weight="bold" font-size="12">척추</text>
+                        <text x="250" y="220" fill="#e74c3c" font-weight="bold" font-size="12">골반</text>
+                        <text x="250" y="260" fill="#e74c3c" font-weight="bold" font-size="12">대퇴골</text>
+                        <text x="250" y="300" fill="#e74c3c" font-weight="bold" font-size="12">경골</text>
+                        
+                        <!-- Damage progression -->
+                        <text x="280" y="140" fill="#ff3333" font-weight="bold" font-size="11">연쇄 손상:</text>
+                        <text x="280" y="155" fill="#ff3333" font-size="10">• 고관절 탈구</text>
+                        <text x="280" y="170" fill="#ff3333" font-size="10">• 비구 골절</text>
+                        <text x="280" y="185" fill="#ff3333" font-size="10">• 요추 압박골절</text>
+                    </svg>
                 </div>
-                <div class="detail-content">
-                    <div class="clinical-example">
-                        <div class="section-title">🏥 발생 과정</div>
-                        <ul class="example-list">
-                            <li><strong>1단계:</strong> 고속 주행</li>
-                            <li><strong>2단계:</strong> 급작스런 방향 전환</li>
-                            <li><strong>3단계:</strong> 차량 전복</li>
-                            <li><strong>4단계:</strong> 여러 방향 충격</li>
-                            <li><strong>5단계:</strong> 승객이 차 안에서 튕겨다님</li>
-                            <li><strong>6단계:</strong> 다양한 부위에서 반복적 충격</li>
-                        </ul>
+                <div class="slide-description">
+                    <h3>에너지 전달 메커니즘</h3>
+                    <ul>
+                        <li>충격 에너지가 다리를 따라 골반, 척추로 전달됩니다</li>
+                        <li>빨간색 펄스 선이 대퇴골에서 고관절, 척추 방향으로 이동합니다</li>
+                        <li>고관절 탈구, 비구 골절, 요추 압박골절 위험이 있습니다</li>
+                        <li>X-ray 스타일의 시각화로 뼈 구조와 에너지 경로를 명확히 표현합니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>⚡ 연쇄 손상 패턴</h4>
+                        <p><strong>1차:</strong> 무릎 → 대퇴골<br>
+                        <strong>2차:</strong> 대퇴골 → 고관절<br>
+                        <strong>3차:</strong> 골반 → 척추<br>
+                        <strong>최종:</strong> 복부 장기 손상 가능</p>
                     </div>
-                    <div class="nursing-care">
-                        <div class="section-title">👩‍⚕️ 예측 불가능한 손상</div>
-                        <ul class="example-list">
-                            <li><strong>머리:</strong> 여러 번 부딪혀 심각한 뇌외상</li>
-                            <li><strong>척추:</strong> 다양한 방향의 힘으로 복잡한 골절</li>
-                            <li><strong>사지:</strong> 여러 부위의 골절과 탈구</li>
-                            <li><strong>내장기관:</strong> 전방위적 손상</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="priority-box">
-                    <div class="priority-title">🚨 전복 사고가 가장 위험한 이유</div>
-                    <span style="font-size: clamp(0.8rem, 2vw, 0.95rem);">예측 불가능한 충격 방향, 반복적 충돌, 다양한 손상 기전이 혼재하며, 차량 변형으로 구조가 지연됩니다.</span>
                 </div>
             </div>
+        </div>
 
-            <button class="btn-reset" onclick="resetAllCards()">🔄 모든 카드 닫기</button>
-
-            <div class="reference-note">
-                <strong>📚 Reference:</strong> 본 자료는 근거기반 간호실무 가이드라인을 바탕으로 제작되었습니다.<br>
-                외상 환자 간호 시 항상 ABCDE 접근법을 우선으로 하며, 의료진과의 협력을 통해 안전한 간호를 제공하세요.
+        <!-- 슬라이드 6: 상체 손상 -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <div class="slide-title">6단계: 상체 손상</div>
+                <div class="slide-subtitle">Torso Forward - 2차 충돌</div>
             </div>
+            <div class="slide-content">
+                <div class="slide-visual">
+                    <svg class="visual-svg" viewBox="0 0 450 350">
+                        <!-- Car interior -->
+                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
+                        
+                        <!-- Dashboard and steering wheel -->
+                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
+                        <circle cx="300" cy="170" r="25" fill="#444" stroke="#666" stroke-width="3"/>
+                        
+                        <!-- Passenger (extreme forward position) -->
+                        <g fill="#d4a574">
+                            <circle cx="250" cy="150" r="15"/>
+                            <rect x="235" y="165" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-25 250 190)"/>
+                            <rect x="230" y="175" width="10" height="30" rx="5" transform="rotate(-40 235 190)"/>
+                            <rect x="255" y="175" width="10" height="30" rx="5" transform="rotate(10 260 190)"/>
+                        </g>
+                        
+                        <!-- Legs stopped at dashboard -->
+                        <rect x="285" y="230" width="12" height="50" rx="6" fill="#1a365d"/>
+                        <rect x="305" y="230" width="12" height="50" rx="6" fill="#1a365d"/>
+                        
+                        <!-- Secondary impact zones -->
+                        <circle cx="275" cy="170" r="6" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
+                        <circle cx="270" cy="155" r="5" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
+                        <circle cx="265" cy="175" r="5" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
+                        
+                        <!-- Risk zone -->
+                        <ellipse cx="290" cy="165" rx="40" ry="25" fill="#ff3333" opacity="0.2"/>
+                        
+                        <!-- Motion arrows -->
+                        <line x1="180" y1="150" x2="240" y2="150" stroke="#e74c3c" stroke-width="4" marker-end="url(#redArrow)"/>
+                        <line x1="180" y1="190" x2="225" y2="190" stroke="#e74c3c" stroke-width="4" marker-end="url(#redArrow)"/>
+                        
+                        <!-- Body part labels with risk indicators -->
+                        <text x="350" y="140" fill="#e74c3c" font-weight="bold" font-size="12">2차 손상 위험:</text>
+                        <text x="350" y="160" fill="#e74c3c" font-size="11">🧠 두부 외상</text>
+                        <text x="350" y="180" fill="#e74c3c" font-size="11">🦴 경추 손상</text>
+                        <text x="350" y="200" fill="#e74c3c" font-size="11">🫁 흉부 압박</text>
+                        <text x="350" y="220" fill="#e74c3c" font-size="11">🩸 내장 손상</text>
+                        
+                        <!-- Danger zone label -->
+                        <text x="250" y="130" fill="#ff3333" font-weight="bold" font-size="14">위험 구역</text>
+                        
+                        <!-- Fixed lower body indicator -->
+                        <text x="320" y="250" fill="#2c3e50" font-size="10">하체 고정</text>
+                        <line x1="290" y1="255" x2="320" y2="255" stroke="#2c3e50" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="slide-description">
+                    <h3>상체 손상 메커니즘</h3>
+                    <ul>
+                        <li>하체가 멈춘 후에도 상체는 관성으로 계속 앞으로 나아갑니다</li>
+                        <li>스티어링 휠 또는 차량 내부와 2차 충돌이 발생할 수 있습니다</li>
+                        <li>흉부, 경추, 두부에 심각한 손상이 생길 수 있습니다</li>
+                        <li>상체와 하체 사이의 극심한 굴곡으로 척추 손상 위험이 증가합니다</li>
+                    </ul>
+                    <div class="key-points">
+                        <h4>🚨 중대한 2차 손상</h4>
+                        <p><strong>두부:</strong> 뇌진탕, 두개골 골절<br>
+                        <strong>경추:</strong> Whiplash, 경추 탈구<br>
+                        <strong>흉부:</strong> 늑골 골절, 폐 손상<br>
+                        <strong>복부:</strong> 내장 파열, 대동맥 손상</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="previousSlide()">◀ 이전</button>
+            <button class="control-btn" onclick="nextSlide()">다음 ▶</button>
+            <button class="control-btn" onclick="playSlideshow()">▶ 자동 재생</button>
+            <button class="control-btn print-btn" onclick="printSlides()">🖨 인쇄용 출력</button>
         </div>
     </div>
 
     <script>
-        function showMechanismDetail(mechanism) {
-            // 모든 카드와 패널 비활성화
-            document.querySelectorAll('.mechanism-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('.detail-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
+        let currentSlide = 0;
+        let totalSlides = 6;
+        let isPlaying = false;
+        let playInterval;
 
-            // 선택된 카드와 패널 활성화
-            document.querySelector(`[data-mechanism="${mechanism}"]`).classList.add('active');
-            document.getElementById(`${mechanism}-detail`).classList.add('active');
+        function showSlide(index) {
+            // Hide all slides
+            for (let i = 0; i < totalSlides; i++) {
+                document.getElementById(`slide-${i}`).classList.remove('active');
+                document.querySelectorAll('.slide-nav-btn')[i].classList.remove('active');
+            }
             
-            // 부드럽게 스크롤
-            document.getElementById(`${mechanism}-detail`).scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-
-        function showTrafficDetail(traffic) {
-            // 모든 카드와 패널 비활성화
-            document.querySelectorAll('.mechanism-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('.accident-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('.detail-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-
-            // 선택된 교통사고 카드와 패널 활성화
-            document.querySelector(`[data-traffic="${traffic}"]`).classList.add('active');
-            document.getElementById(`${traffic}-detail`).classList.add('active');
+            // Show selected slide
+            document.getElementById(`slide-${index}`).classList.add('active');
+            document.querySelectorAll('.slide-nav-btn')[index].classList.add('active');
             
-            // 부드럽게 스크롤
-            document.getElementById(`${traffic}-detail`).scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            currentSlide = index;
         }
 
-        function resetAllCards() {
-            document.querySelectorAll('.mechanism-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('.accident-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('.detail-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
+        function nextSlide() {
+            const next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
         }
 
-        // 카드 클릭 이벤트 리스너
-        document.querySelectorAll('.mechanism-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const mechanism = card.getAttribute('data-mechanism');
-                showMechanismDetail(mechanism);
-            });
+        function previousSlide() {
+            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+
+        function playSlideshow() {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                isPlaying = false;
+                document.querySelector('.control-btn:nth-child(3)').textContent = '▶ 자동 재생';
+            } else {
+                isPlaying = true;
+                document.querySelector('.control-btn:nth-child(3)').textContent = '⏸ 정지';
+                playInterval = setInterval(() => {
+                    nextSlide();
+                }, 4000);
+            }
+        }
+
+        function printSlides() {
+            window.print();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (!isPlaying) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    previousSlide();
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                if (isPlaying) {
+                    playSlideshow();
+                }
+            }
         });
 
-        // 교통사고 카드 클릭 이벤트 리스너
-        document.querySelectorAll('.accident-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const traffic = card.getAttribute('data-traffic');
-                showTrafficDetail(traffic);
-            });
+        // Initialize
+        window.addEventListener('load', function() {
+            showSlide(0);
         });
 
-        // 초기 로딩 애니메이션
-        window.addEventListener('load', () => {
-            document.querySelectorAll('.mechanism-card').forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(50px)';
-                    setTimeout(() => {
-                        card.style.transition = 'all 0.5s ease';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 100);
-            });
+        // Touch navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-            // 교통사고 카드 애니메이션
-            document.querySelectorAll('.accident-card').forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateX(-50px)';
-                    setTimeout(() => {
-                        card.style.transition = 'all 0.5s ease';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateX(0)';
-                    }, 100);
-                }, (index * 150) + 500);
-            });
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
         });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                previousSlide();
+            }
+        }
     </script>
 </body>
 </html>

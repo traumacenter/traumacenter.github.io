@@ -1,873 +1,694 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Down and Under 패턴 교육 슬라이드</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+from datetime import datetime
+import base64
 
-        body {
-            font-family: 'Malgun Gothic', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #2c3e50;
-            line-height: 1.6;
-        }
+# 페이지 설정
+st.set_page_config(
+    page_title="CBI 번아웃 측정 프로그램",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-        .presentation-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+# CSS 스타일링 - 따뜻하고 전문적인 디자인
+st.markdown("""
+<style>
+    .main {
+        padding-top: 2rem;
+    }
+    
+    .stApp {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    }
+    
+    .main-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin: 1rem;
+    }
+    
+    .header-title {
+        color: #d2691e;
+        font-size: 3rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header-subtitle {
+        color: #8b4513;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 300;
+    }
+    
+    .section-header {
+        color: #cd853f;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem 0;
+        border-bottom: 3px solid #deb887;
+        padding-bottom: 0.5rem;
+    }
+    
+    .metric-card {
+        background: linear-gradient(135deg, #fff8dc 0%, #f5deb3 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border-left: 5px solid #d2691e;
+        margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .risk-low {
+        border-left-color: #32cd32;
+        background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%);
+    }
+    
+    .risk-medium {
+        border-left-color: #ffa500;
+        background: linear-gradient(135deg, #fff8dc 0%, #ffeaa7 100%);
+    }
+    
+    .risk-high {
+        border-left-color: #dc143c;
+        background: linear-gradient(135deg, #ffe4e1 0%, #ffcccb 100%);
+    }
+    
+    .recommendation-box {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid #c3e6cb;
+        margin: 1rem 0;
+    }
+    
+    .stButton > button {
+        background: linear-gradient(135deg, #d2691e 0%, #cd853f 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(210, 105, 30, 0.3);
+    }
+    
+    .question-container {
+        background: #fafafa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        border-left: 4px solid #d2691e;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+# CBI 문항 정의
+CBI_QUESTIONS = {
+    'personal': [
+        "얼마나 자주 피곤함을 느끼십니까?",
+        "얼마나 자주 신체적으로 탈진감을 느끼십니까?",
+        "얼마나 자주 정서적으로 탈진감을 느끼십니까?",
+        "얼마나 자주 '더 이상 견딜 수 없다'고 생각하십니까?",
+        "얼마나 자주 지친다고 느끼십니까?",
+        "얼마나 자주 몸이 약해졌다고 느끼십니까?"
+    ],
+    'work': [
+        "일로 인해 얼마나 자주 지치십니까?",
+        "일로 인해 얼마나 자주 신체적으로 탈진감을 느끼십니까?",
+        "일로 인해 얼마나 자주 정서적으로 탈진감을 느끼십니까?",
+        "일로 인해 얼마나 자주 좌절감을 느끼십니까?",
+        "일로 인해 얼마나 자주 완전히 지쳐버린다고 느끼십니까?",
+        "일에 대해 생각하는 것이 얼마나 자주 스트레스가 됩니까?",
+        "아침에 일어나서 또 하루 일해야 한다고 생각하면 얼마나 자주 지치십니까?"
+    ],
+    'client': [
+        "환자들과 일하는 것이 얼마나 자주 스트레스가 됩니까?",
+        "환자들과 일한 후 얼마나 자주 지치십니까?",
+        "환자들과 일하는 것이 얼마나 자주 좌절스럽습니까?",
+        "환자들과 일할 때 얼마나 자주 한계를 느끼십니까?",
+        "환자들과 일하는 것이 얼마나 자주 정서적으로 힘듭니까?",
+        "환자들에게 에너지를 주는 것이 얼마나 자주 힘듭니까?"
+    ]
+}
 
-        .header h1 {
-            font-size: 2.5em;
-            color: #e74c3c;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+ANSWER_OPTIONS = [
+    "전혀 그렇지 않다",
+    "거의 그렇지 않다", 
+    "가끔 그렇다",
+    "자주 그렇다",
+    "항상 그렇다"
+]
 
-        .header .subtitle {
-            font-size: 1.2em;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
+def get_risk_level(score):
+    """점수에 따른 위험도 반환"""
+    if score < 2.0:
+        return "낮음", "risk-low", "#32cd32"
+    elif score < 2.5:
+        return "경계", "risk-medium", "#ffa500"
+    elif score < 3.5:
+        return "보통", "risk-medium", "#ffa500"
+    else:
+        return "높음", "risk-high", "#dc143c"
 
-        .header .description {
-            font-size: 1em;
-            color: #34495e;
-            max-width: 800px;
-            margin: 0 auto;
+def interpret_score(domain, score):
+    """영역별 점수 해석"""
+    risk_level, _, _ = get_risk_level(score)
+    
+    interpretations = {
+        'personal': {
+            '낮음': "기본적인 에너지 수준이 양호하며, 일상생활에서 활력감을 잘 유지하고 있습니다.",
+            '경계': "전반적인 피로감이 약간 증가하고 있습니다. 예방적 관리가 필요합니다.",
+            '보통': "전반적인 피로감이 증가하고 있으며, 휴식 후에도 완전한 회복이 어려울 수 있습니다.",
+            '높음': "심각한 전반적 탈진 상태로, 기본적인 일상생활도 힘든 상황입니다."
+        },
+        'work': {
+            '낮음': "업무 환경에 잘 적응하고 있으며, 업무 스트레스를 효과적으로 관리하고 있습니다.",
+            '경계': "업무 스트레스가 약간 누적되고 있습니다. 주의 깊은 관찰이 필요합니다.",
+            '보통': "업무 스트레스가 누적되어 업무로 인한 피로감이 증가하고 있습니다.",
+            '높음': "업무로 인한 심각한 탈진 상태로, 출근 자체가 큰 스트레스가 되고 있습니다."
+        },
+        'client': {
+            '낮음': "환자와의 관계에서 만족감을 느끼며, 공감 능력을 잘 유지하고 있습니다.",
+            '경계': "환자 관계에서 약간의 스트레스가 나타나기 시작했습니다.",
+            '보통': "환자 관계에서 스트레스가 증가하고 있으며, 공감 피로가 시작되었습니다.",
+            '높음': "환자와의 관계에서 심한 탈진을 느끼며, 공감 능력이 현저히 감소했습니다."
         }
+    }
+    
+    return interpretations[domain][risk_level]
 
-        .slide-navigation {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+def get_recommendations(personal_score, work_score, client_score):
+    """맞춤형 권고사항 생성"""
+    recommendations = []
+    
+    # 개인적 번아웃 권고사항
+    if personal_score >= 3.5:
+        recommendations.append({
+            "영역": "개인적 번아웃 (긴급)",
+            "권고사항": [
+                "즉시 의료진 상담을 받으시기 바랍니다",
+                "장기간 휴식을 고려해보세요",
+                "근본적인 생활 방식 변화가 필요합니다",
+                "전문적인 심리 상담을 받는 것을 권장합니다"
+            ],
+            "우선순위": "높음"
+        })
+    elif personal_score >= 2.0:
+        recommendations.append({
+            "영역": "개인적 번아웃",
+            "권고사항": [
+                "수면 패턴을 개선하세요 (7-8시간 수면)",
+                "정기적인 운동을 시작하세요 (주 3회, 30분)",
+                "스트레스 관리 기법을 도입하세요 (명상, 요가 등)",
+                "영양 균형을 맞춘 식사를 하세요"
+            ],
+            "우선순위": "중간"
+        })
+    
+    # 업무 관련 번아웃 권고사항
+    if work_score >= 3.5:
+        recommendations.append({
+            "영역": "업무 관련 번아웃 (긴급)",
+            "권고사항": [
+                "상급자와 즉시 업무 조정을 논의하세요",
+                "부서 이동이나 휴직을 고려해보세요",
+                "직장 내 상담실을 이용하세요",
+                "업무량 재분배를 요청하세요"
+            ],
+            "우선순위": "높음"
+        })
+    elif work_score >= 2.0:
+        recommendations.append({
+            "영역": "업무 관련 번아웃",
+            "권고사항": [
+                "업무량 조절을 상급자와 협의하세요",
+                "동료와의 업무 분담을 늘리세요",
+                "업무 효율성 개선 방법을 찾아보세요",
+                "정기적인 휴가를 활용하세요"
+            ],
+            "우선순위": "중간"
+        })
+    
+    # 환자 관련 번아웃 권고사항
+    if client_score >= 3.5:
+        recommendations.append({
+            "영역": "환자 관련 번아웃 (긴급)",
+            "권고사항": [
+                "환자 접촉 빈도를 일시적으로 조절하세요",
+                "감정 지지 상담을 받으세요",
+                "업무 영역을 재조정해보세요",
+                "동료들과 어려운 사례를 공유하세요"
+            ],
+            "우선순위": "높음"
+        })
+    elif client_score >= 2.0:
+        recommendations.append({
+            "영역": "환자 관련 번아웃",
+            "권고사항": [
+                "감정 조절 기법을 학습하세요",
+                "동료와의 경험 공유 시간을 가지세요",
+                "환자 관계 개선 교육에 참여하세요",
+                "디브리핑 시간을 정기적으로 가지세요"
+            ],
+            "우선순위": "중간"
+        })
+    
+    # 전체적으로 양호한 경우
+    if not recommendations:
+        recommendations.append({
+            "영역": "예방 관리",
+            "권고사항": [
+                "현재의 건강한 상태를 유지하세요",
+                "정기적인 자기 점검을 계속하세요",
+                "스트레스 관리 기법을 지속적으로 실천하세요",
+                "동료들과의 긍정적 관계를 유지하세요"
+            ],
+            "우선순위": "낮음"
+        })
+    
+    return recommendations
 
-        .slide-nav-btn {
-            padding: 12px 20px;
-            background: white;
-            border: 2px solid #3498db;
-            color: #3498db;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-width: 120px;
-        }
+def create_radar_chart(personal_score, work_score, client_score):
+    """레이더 차트 생성"""
+    categories = ['개인적 번아웃', '업무 관련 번아웃', '환자 관련 번아웃']
+    values = [personal_score, work_score, client_score]
+    
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatterpolar(
+        r=values,
+        theta=categories,
+        fill='toself',
+        fillcolor='rgba(210, 105, 30, 0.3)',
+        line=dict(color='#d2691e', width=3),
+        marker=dict(size=8, color='#d2691e'),
+        name='현재 점수'
+    ))
+    
+    # 기준선 추가
+    fig.add_trace(go.Scatterpolar(
+        r=[2.5, 2.5, 2.5],
+        theta=categories,
+        fill='toself',
+        fillcolor='rgba(255, 165, 0, 0.1)',
+        line=dict(color='#ffa500', width=2, dash='dash'),
+        name='주의 기준선 (2.5점)'
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 4],
+                tickvals=[1, 2, 3, 4],
+                ticktext=['1점', '2점', '3점', '4점']
+            )
+        ),
+        showlegend=True,
+        title="CBI 번아웃 점수 분포",
+        font=dict(size=14),
+        width=500,
+        height=500
+    )
+    
+    return fig
 
-        .slide-nav-btn:hover {
-            background: #3498db;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
-        }
-
-        .slide-nav-btn.active {
-            background: #e74c3c;
-            border-color: #e74c3c;
-            color: white;
-            box-shadow: 0 5px 20px rgba(231,76,60,0.4);
-        }
-
-        .slide {
-            display: none;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 20px;
-            min-height: 700px;
-        }
-
-        .slide.active {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-header {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .slide-title {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .slide-subtitle {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .slide-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 30px;
-            align-items: center;
-            min-height: 500px;
-        }
-
-        .slide-visual {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .slide-description {
-            padding: 20px;
-        }
-
-        .slide-description h3 {
-            color: #2c3e50;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .slide-description ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .slide-description li {
-            margin-bottom: 15px;
-            padding-left: 25px;
-            position: relative;
-            font-size: 1.1em;
-            line-height: 1.7;
-        }
-
-        .slide-description li::before {
-            content: "▸";
-            position: absolute;
-            left: 0;
-            color: #e74c3c;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .key-points {
-            background: #ecf0f1;
-            border-left: 5px solid #e74c3c;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .key-points h4 {
-            color: #e74c3c;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        /* SVG Visuals */
-        .visual-svg {
-            width: 100%;
-            max-width: 450px;
-            height: 350px;
-        }
-
-        /* Slide-specific styles */
-        .speed-indicator {
-            font-size: 1.2em;
-            font-weight: bold;
-            fill: #e74c3c;
-        }
-
-        .trajectory-line {
-            stroke-width: 4;
-            stroke-dasharray: 5,5;
-            opacity: 0.8;
-        }
-
-        .impact-effect {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-        }
-
-        .energy-flow {
-            animation: energyMove 3s ease-in-out infinite;
-        }
-
-        @keyframes energyMove {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .control-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .control-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52,152,219,0.4);
-        }
-
-        .print-btn {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-        }
-
-        .print-btn:hover {
-            box-shadow: 0 5px 15px rgba(46,204,113,0.4);
-        }
-
-        /* Print styles */
-        @media print {
-            body {
-                background: white;
-            }
+def main():
+    # 메인 헤더
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    st.markdown('<h1 class="header-title">🧠 CBI 번아웃 측정 프로그램</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="header-subtitle">Copenhagen Burnout Inventory를 통한 전문적인 번아웃 평가</p>', unsafe_allow_html=True)
+    
+    # 사이드바 - 기본 정보
+    with st.sidebar:
+        st.markdown("### 📋 기본 정보")
+        name = st.text_input("이름 (선택사항)", placeholder="익명으로도 가능합니다")
+        job = st.selectbox("직업", ["간호사", "의사", "기타 의료진", "기타"])
+        if job == "간호사":
+            department = st.selectbox("근무 부서", ["외상센터", "응급실", "중환자실", "일반병동", "기타"])
+        else:
+            department = "해당없음"
+        experience = st.selectbox("경력", ["1년 미만", "1-3년", "3-5년", "5-10년", "10년 이상"])
+    
+    # 초기 상태 설정
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 'intro'
+    if 'answers' not in st.session_state:
+        st.session_state.answers = {}
+    
+    # 시작 페이지
+    if st.session_state.current_page == 'intro':
+        st.markdown('<h2 class="section-header">📖 CBI 번아웃 측정이란?</h2>', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("""
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
+            <h3 style="color: #d2691e; margin-bottom: 1rem;">🎯 측정 목적</h3>
+            <p style="line-height: 1.6;">
+            CBI는 개인적, 업무 관련, 환자 관련 3개 영역에서 번아웃 수준을 측정하여 
+            구체적인 원인을 파악하고 맞춤형 관리 방안을 제시합니다.
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            .slide-navigation,
-            .controls {
-                display: none;
-            }
+            st.markdown("""
+            <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
+            <h3 style="color: #d2691e; margin-bottom: 1rem;">📊 측정 방법</h3>
+            <ul style="line-height: 1.8;">
+                <li><strong>총 19문항</strong>을 5점 척도로 평가</li>
+                <li><strong>약 5-10분</strong> 소요</li>
+                <li><strong>즉시 결과</strong> 확인 및 분석</li>
+                <li><strong>맞춤형 권고사항</strong> 제공</li>
+            </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #fff8dc 0%, #f5deb3 100%); 
+                        padding: 1.5rem; border-radius: 15px; text-align: center;">
+                <h3 style="color: #d2691e; margin-bottom: 1rem;">⏱️ 소요 시간</h3>
+                <div style="font-size: 2.5rem; color: #cd853f; font-weight: bold;">5-10분</div>
+                <p style="margin-top: 1rem; color: #8b4513;">정확한 측정을 위해<br>신중하게 답해주세요</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("🚀 측정 시작하기", key="start_button"):
+            st.session_state.current_page = 'assessment'
+            st.rerun()
+    
+    # 측정 페이지
+    elif st.session_state.current_page == 'assessment':
+        st.markdown('<h2 class="section-header">📝 CBI 번아웃 측정</h2>', unsafe_allow_html=True)
+        
+        # 진행률 표시
+        total_questions = len(CBI_QUESTIONS['personal']) + len(CBI_QUESTIONS['work']) + len(CBI_QUESTIONS['client'])
+        current_answers = len(st.session_state.answers)
+        progress = current_answers / total_questions
+        
+        st.progress(progress)
+        st.markdown(f"<p style='text-align: center; color: #8b4513;'>진행률: {current_answers}/{total_questions} ({progress*100:.1f}%)</p>", unsafe_allow_html=True)
+        
+        # 개인적 번아웃 영역
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">🏠 개인적 번아웃 (6문항)</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="color: #8b4513; margin-bottom: 1rem;">일과 관계없는 전반적인 피로와 탈진 정도를 평가합니다.</p>', unsafe_allow_html=True)
+        
+        for i, question in enumerate(CBI_QUESTIONS['personal']):
+            st.markdown(f'<div class="question-container">', unsafe_allow_html=True)
+            st.markdown(f'<p style="font-weight: 600; color: #d2691e;">Q{i+1}. {question}</p>', unsafe_allow_html=True)
+            answer = st.radio(
+                f"답변 선택 (Q{i+1})",
+                ANSWER_OPTIONS,
+                key=f"personal_{i}",
+                label_visibility="collapsed",
+                horizontal=True
+            )
+            st.session_state.answers[f"personal_{i}"] = ANSWER_OPTIONS.index(answer)
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # 업무 관련 번아웃 영역
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">💼 업무 관련 번아웃 (7문항)</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="color: #8b4513; margin-bottom: 1rem;">직접적으로 업무로 인한 피로와 탈진 정도를 평가합니다.</p>', unsafe_allow_html=True)
+        
+        for i, question in enumerate(CBI_QUESTIONS['work']):
+            st.markdown(f'<div class="question-container">', unsafe_allow_html=True)
+            st.markdown(f'<p style="font-weight: 600; color: #d2691e;">Q{i+7}. {question}</p>', unsafe_allow_html=True)
+            answer = st.radio(
+                f"답변 선택 (Q{i+7})",
+                ANSWER_OPTIONS,
+                key=f"work_{i}",
+                label_visibility="collapsed",
+                horizontal=True
+            )
+            st.session_state.answers[f"work_{i}"] = ANSWER_OPTIONS.index(answer)
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # 환자 관련 번아웃 영역  
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">👥 환자 관련 번아웃 (6문항)</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="color: #8b4513; margin-bottom: 1rem;">환자나 고객과의 상호작용에서 오는 탈진 정도를 평가합니다.</p>', unsafe_allow_html=True)
+        
+        for i, question in enumerate(CBI_QUESTIONS['client']):
+            st.markdown(f'<div class="question-container">', unsafe_allow_html=True)
+            st.markdown(f'<p style="font-weight: 600; color: #d2691e;">Q{i+14}. {question}</p>', unsafe_allow_html=True)
+            answer = st.radio(
+                f"답변 선택 (Q{i+14})",
+                ANSWER_OPTIONS,
+                key=f"client_{i}",
+                label_visibility="collapsed",
+                horizontal=True
+            )
+            st.session_state.answers[f"client_{i}"] = ANSWER_OPTIONS.index(answer)
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("📊 결과 분석하기", key="analyze_button"):
+                if len(st.session_state.answers) == total_questions:
+                    st.session_state.current_page = 'results'
+                    st.rerun()
+                else:
+                    st.error("모든 문항에 답변해주세요.")
+    
+    # 결과 페이지
+    elif st.session_state.current_page == 'results':
+        # 점수 계산
+        personal_scores = [st.session_state.answers[f"personal_{i}"] for i in range(len(CBI_QUESTIONS['personal']))]
+        work_scores = [st.session_state.answers[f"work_{i}"] for i in range(len(CBI_QUESTIONS['work']))]
+        client_scores = [st.session_state.answers[f"client_{i}"] for i in range(len(CBI_QUESTIONS['client']))]
+        
+        personal_avg = np.mean(personal_scores)
+        work_avg = np.mean(work_scores)
+        client_avg = np.mean(client_scores)
+        overall_avg = np.mean([personal_avg, work_avg, client_avg])
+        
+        st.markdown('<h2 class="section-header">📊 CBI 번아웃 측정 결과</h2>', unsafe_allow_html=True)
+        
+        # 기본 정보 표시
+        if name:
+            st.markdown(f"<p style='text-align: center; font-size: 1.2rem; color: #8b4513;'>👤 {name}님의 측정 결과</p>", unsafe_allow_html=True)
+        
+        info_text = f"📅 측정일: {datetime.now().strftime('%Y년 %m월 %d일')} | 👔 직업: {job}"
+        if department != "해당없음":
+            info_text += f" ({department})"
+        info_text += f" | 📈 경력: {experience}"
+        st.markdown(f"<p style='text-align: center; color: #8b4513; margin-bottom: 2rem;'>{info_text}</p>", unsafe_allow_html=True)
+        
+        # 전체 점수 요약
+        st.markdown('<h3 style="color: #d2691e;">🎯 종합 점수</h3>', unsafe_allow_html=True)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            risk_level, risk_class, risk_color = get_risk_level(overall_avg)
+            st.markdown(f"""
+            <div class="metric-card {risk_class}">
+                <h4 style="margin: 0; color: {risk_color};">전체 평균</h4>
+                <div style="font-size: 2rem; font-weight: bold; color: {risk_color};">{overall_avg:.2f}점</div>
+                <p style="margin: 0; color: {risk_color};">{risk_level} 위험</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            risk_level, risk_class, risk_color = get_risk_level(personal_avg)
+            st.markdown(f"""
+            <div class="metric-card {risk_class}">
+                <h4 style="margin: 0; color: {risk_color};">개인적 번아웃</h4>
+                <div style="font-size: 2rem; font-weight: bold; color: {risk_color};">{personal_avg:.2f}점</div>
+                <p style="margin: 0; color: {risk_color};">{risk_level} 위험</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            risk_level, risk_class, risk_color = get_risk_level(work_avg)
+            st.markdown(f"""
+            <div class="metric-card {risk_class}">
+                <h4 style="margin: 0; color: {risk_color};">업무 관련 번아웃</h4>
+                <div style="font-size: 2rem; font-weight: bold; color: {risk_color};">{work_avg:.2f}점</div>
+                <p style="margin: 0; color: {risk_color};">{risk_level} 위험</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            risk_level, risk_class, risk_color = get_risk_level(client_avg)
+            st.markdown(f"""
+            <div class="metric-card {risk_class}">
+                <h4 style="margin: 0; color: {risk_color};">환자 관련 번아웃</h4>
+                <div style="font-size: 2rem; font-weight: bold; color: {risk_color};">{client_avg:.2f}점</div>
+                <p style="margin: 0; color: {risk_color};">{risk_level} 위험</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # 시각화
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">📈 시각적 분석</h3>', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            # 레이더 차트
+            fig_radar = create_radar_chart(personal_avg, work_avg, client_avg)
+            st.plotly_chart(fig_radar, use_container_width=True)
+        
+        with col2:
+            # 막대 차트
+            fig_bar = px.bar(
+                x=['개인적', '업무관련', '환자관련'],
+                y=[personal_avg, work_avg, client_avg],
+                color=[personal_avg, work_avg, client_avg],
+                color_continuous_scale=['#32cd32', '#ffa500', '#dc143c'],
+                title="영역별 번아웃 점수 비교"
+            )
+            fig_bar.add_hline(y=2.5, line_dash="dash", line_color="orange", 
+                             annotation_text="주의 기준선 (2.5점)")
+            fig_bar.add_hline(y=3.5, line_dash="dash", line_color="red", 
+                             annotation_text="고위험 기준선 (3.5점)")
+            fig_bar.update_layout(showlegend=False, yaxis_range=[0, 4])
+            fig_bar.update_yaxis(title="점수")
+            fig_bar.update_xaxis(title="번아웃 영역")
+            st.plotly_chart(fig_bar, use_container_width=True)
+        
+        # 상세 해석
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">🔍 상세 해석</h3>', unsafe_allow_html=True)
+        
+        domains = [
+            ('개인적 번아웃', 'personal', personal_avg),
+            ('업무 관련 번아웃', 'work', work_avg),
+            ('환자 관련 번아웃', 'client', client_avg)
+        ]
+        
+        for domain_name, domain_key, score in domains:
+            risk_level, risk_class, risk_color = get_risk_level(score)
+            interpretation = interpret_score(domain_key, score)
             
-            .slide {
-                display: block !important;
-                page-break-after: always;
-                box-shadow: none;
-                border: 2px solid #ddd;
-                margin-bottom: 0;
-            }
+            st.markdown(f"""
+            <div class="metric-card {risk_class}">
+                <h4 style="color: {risk_color}; margin-bottom: 1rem;">📋 {domain_name} ({score:.2f}점 - {risk_level} 위험)</h4>
+                <p style="line-height: 1.6; margin: 0;">{interpretation}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # 맞춤형 권고사항
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">💡 맞춤형 권고사항</h3>', unsafe_allow_html=True)
+        
+        recommendations = get_recommendations(personal_avg, work_avg, client_avg)
+        
+        for rec in recommendations:
+            priority_color = {"높음": "#dc143c", "중간": "#ffa500", "낮음": "#32cd32"}[rec["우선순위"]]
             
-            .slide:last-child {
-                page-break-after: avoid;
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .slide-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+            st.markdown(f"""
+            <div class="recommendation-box">
+                <h4 style="color: {priority_color}; margin-bottom: 1rem;">
+                    🎯 {rec["영역"]} (우선순위: {rec["우선순위"]})
+                </h4>
+            """, unsafe_allow_html=True)
             
-            .slide-visual {
-                order: 1;
-            }
+            for i, item in enumerate(rec["권고사항"], 1):
+                st.markdown(f"<p style='margin: 0.5rem 0; line-height: 1.6;'>✅ {item}</p>", unsafe_allow_html=True)
             
-            .slide-description {
-                order: 2;
-            }
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        # 추가 정보
+        st.markdown('<h3 style="color: #d2691e; margin-top: 2rem;">📚 추가 정보</h3>', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            <div style="background: #f0f8ff; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #4169e1;">
+                <h4 style="color: #4169e1; margin-bottom: 1rem;">📞 전문가 도움이 필요한 경우</h4>
+                <ul style="line-height: 1.8;">
+                    <li>어느 영역이든 <strong>3.5점 이상</strong></li>
+                    <li>2주 이상 <strong>지속되는 증상</strong></li>
+                    <li>일상생활에 <strong>심각한 지장</strong></li>
+                    <li>자해나 자살 생각</li>
+                </ul>
+                <p style="margin-top: 1rem; font-weight: 600; color: #4169e1;">
+                    🏥 직장 내 상담실 또는 정신건강 전문의 상담을 받으시기 바랍니다.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div style="background: #f5f5dc; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #daa520;">
+                <h4 style="color: #daa520; margin-bottom: 1rem;">📅 정기 측정 권장</h4>
+                <ul style="line-height: 1.8;">
+                    <li><strong>신규간호사:</strong> 매월 1회 (첫 6개월)</li>
+                    <li><strong>경력간호사:</strong> 분기별 1회</li>
+                    <li><strong>고위험군:</strong> 매월 1회</li>
+                </ul>
+                <p style="margin-top: 1rem; font-weight: 600; color: #daa520;">
+                    📈 변화 추이를 관찰하여 조기 개입하는 것이 중요합니다.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        # 버튼들
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🔄 다시 측정하기", key="restart_button"):
+                st.session_state.clear()
+                st.rerun()
             
-            .slide-nav-btn {
-                min-width: 100px;
-                font-size: 12px;
-                padding: 10px 15px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="presentation-container">
-        <div class="header">
-            <h1>Down and Under 패턴</h1>
-            <div class="subtitle">정면충돌 손상기전 교육자료</div>
-            <div class="description">
-                안전벨트 미착용 시 발생하는 특징적인 손상 메커니즘을 단계별로 분석합니다. 
-                의료진 교육 및 교통안전 교육에 활용할 수 있도록 구성되었습니다.
-            </div>
-        </div>
-
-        <div class="slide-navigation">
-            <button class="slide-nav-btn active" onclick="showSlide(0)">1. 차량 급제동</button>
-            <button class="slide-nav-btn" onclick="showSlide(1)">2. Down 움직임</button>
-            <button class="slide-nav-btn" onclick="showSlide(2)">3. Under 움직임</button>
-            <button class="slide-nav-btn" onclick="showSlide(3)">4. 무릎 충돌</button>
-            <button class="slide-nav-btn" onclick="showSlide(4)">5. 에너지 전달</button>
-            <button class="slide-nav-btn" onclick="showSlide(5)">6. 상체 손상</button>
-        </div>
-
-        <!-- 슬라이드 1: 차량 급제동 -->
-        <div class="slide active" id="slide-0">
-            <div class="slide-header">
-                <div class="slide-title">1단계: 차량 급제동</div>
-                <div class="slide-subtitle">Sudden Braking</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Road -->
-                        <rect x="0" y="250" width="450" height="100" fill="#4a4a4a"/>
-                        <rect x="0" y="290" width="450" height="4" fill="#fff" opacity="0.8"/>
-                        
-                        <!-- Car exterior -->
-                        <rect x="150" y="180" width="200" height="70" rx="15" fill="#2c5aa0"/>
-                        <rect x="170" y="190" width="160" height="35" rx="8" fill="#87ceeb" opacity="0.7"/>
-                        
-                        <!-- Wheels -->
-                        <circle cx="180" cy="260" r="20" fill="#1a1a1a"/>
-                        <circle cx="320" cy="260" r="20" fill="#1a1a1a"/>
-                        
-                        <!-- Brake lights -->
-                        <rect x="340" y="200" width="8" height="25" rx="4" fill="#ff0000" class="impact-effect"/>
-                        
-                        <!-- Tire marks -->
-                        <rect x="50" y="265" width="120" height="4" fill="#333" opacity="0.8"/>
-                        <rect x="50" y="275" width="120" height="4" fill="#333" opacity="0.8"/>
-                        
-                        <!-- Speed indicators -->
-                        <text x="100" y="150" class="speed-indicator">60km/h</text>
-                        <text x="300" y="150" class="speed-indicator">0km/h</text>
-                        <line x1="140" y1="155" x2="260" y2="155" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowhead)"/>
-                        
-                        <!-- Inertia force arrow -->
-                        <defs>
-                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
-                            </marker>
-                        </defs>
-                        <line x1="250" y1="220" x2="320" y2="220" stroke="#e74c3c" stroke-width="4" marker-end="url(#arrowhead)"/>
-                        <text x="280" y="240" fill="#e74c3c" font-weight="bold" font-size="14">관성력</text>
-                        
-                        <!-- Impact label -->
-                        <text x="375" y="195" fill="#ff0000" font-weight="bold" font-size="12">브레이크등</text>
-                        <text x="30" y="290" fill="#333" font-weight="bold" font-size="12">스키드 마크</text>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>물리적 상황 분석</h3>
-                    <ul>
-                        <li>차량이 정면 충돌하며 순간적으로 정지합니다 (예: 60km/h → 0)</li>
-                        <li>브레이크등이 깜빡이고, 타이어는 스키드 마크를 남깁니다</li>
-                        <li>이 순간, 탑승자에게 체중의 30~50배에 달하는 관성력이 작용합니다</li>
-                        <li>차량은 멈추지만 승객의 몸은 계속 전진하려는 힘을 받습니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>⚠️ 핵심 포인트</h4>
-                        <p>뉴턴 제1법칙(관성의 법칙): 움직이던 물체는 외부 힘이 없으면 계속 움직이려 함</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 슬라이드 2: Down 움직임 시작 -->
-        <div class="slide" id="slide-1">
-            <div class="slide-header">
-                <div class="slide-title">2단계: Down 움직임 시작</div>
-                <div class="slide-subtitle">하향 이동 시작</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Car interior frame -->
-                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
-                        
-                        <!-- Seat -->
-                        <rect x="80" y="180" width="80" height="100" rx="10" fill="#2a2a2a"/>
-                        <rect x="85" y="185" width="70" height="80" rx="8" fill="#444"/>
-                        
-                        <!-- Dashboard -->
-                        <path d="M 300 120 Q 340 120 340 160 L 340 220 L 300 220 Z" fill="#2a2a2a"/>
-                        
-                        <!-- Passenger (initial position - dotted) -->
-                        <g stroke="#bbb" stroke-width="2" fill="none" stroke-dasharray="3,3" opacity="0.4">
-                            <circle cx="140" cy="140" r="15"/>
-                            <rect x="125" y="155" width="30" height="50" rx="5"/>
-                            <rect x="120" y="205" width="12" height="40" rx="6"/>
-                            <rect x="148" y="205" width="12" height="40" rx="6"/>
-                        </g>
-                        
-                        <!-- Passenger (moved position) -->
-                        <g fill="#d4a574">
-                            <circle cx="140" cy="160" r="15"/>
-                            <rect x="125" y="175" width="30" height="50" rx="5" fill="#3498db"/>
-                            <rect x="120" y="225" width="12" height="40" rx="6" fill="#1a365d"/>
-                            <rect x="148" y="225" width="12" height="40" rx="6" fill="#1a365d"/>
-                        </g>
-                        
-                        <!-- Down trajectory -->
-                        <line x1="140" y1="100" x2="140" y2="200" stroke="#ffd700" stroke-width="4" class="trajectory-line"/>
-                        <text x="150" y="150" fill="#ffd700" font-weight="bold" font-size="14">DOWN</text>
-                        
-                        <!-- Force arrows -->
-                        <defs>
-                            <marker id="yellowArrow" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
-                                <polygon points="0 0, 8 3, 0 6" fill="#ffd700"/>
-                            </marker>
-                        </defs>
-                        <line x1="100" y1="140" x2="100" y2="180" stroke="#ffd700" stroke-width="3" marker-end="url(#yellowArrow)"/>
-                        <text x="60" y="160" fill="#ffd700" font-weight="bold" font-size="12">중력+관성</text>
-                        
-                        <!-- No seatbelt indicator -->
-                        <text x="200" y="140" fill="#e74c3c" font-weight="bold" font-size="16">⚠️ 안전벨트 미착용</text>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>Down 움직임 메커니즘</h3>
-                    <ul>
-                        <li>안전벨트를 착용하지 않은 승객은 상체를 제어하지 못합니다</li>
-                        <li>중력과 관성이 함께 작용하며 몸이 아래로 미끄러지기 시작합니다</li>
-                        <li>좌석 표면에서 승객이 하향으로 슬라이딩하는 현상이 발생합니다</li>
-                        <li>노란색 수직 궤적선을 통해 Down 방향을 시각화합니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>🔍 중요 관찰 포인트</h4>
-                        <p>안전벨트가 있었다면 상체가 고정되어 이런 하향 이동이 방지되었을 것입니다</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 슬라이드 3: Under 움직임 -->
-        <div class="slide" id="slide-2">
-            <div class="slide-header">
-                <div class="slide-title">3단계: Under 움직임</div>
-                <div class="slide-subtitle">대시보드 하부로 향하는 복합 궤적</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Car interior -->
-                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
-                        
-                        <!-- Dashboard -->
-                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
-                        
-                        <!-- Seat -->
-                        <rect x="80" y="180" width="80" height="100" rx="10" fill="#2a2a2a"/>
-                        
-                        <!-- Passenger in forward position -->
-                        <g fill="#d4a574">
-                            <circle cx="180" cy="180" r="15"/>
-                            <rect x="165" y="195" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-10 180 220)"/>
-                            <rect x="160" y="245" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-5 166 265)"/>
-                            <rect x="188" y="245" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-5 194 265)"/>
-                        </g>
-                        
-                        <!-- Complex trajectory (Down + Under) -->
-                        <path d="M 140 140 Q 160 160 180 180 Q 220 200 260 240" stroke="#ffd700" stroke-width="4" fill="none" class="trajectory-line"/>
-                        
-                        <!-- Horizontal trajectory -->
-                        <line x1="180" y1="240" x2="280" y2="240" stroke="#ff6600" stroke-width="4" class="trajectory-line"/>
-                        
-                        <!-- Labels -->
-                        <text x="120" y="170" fill="#ffd700" font-weight="bold" font-size="12">DOWN</text>
-                        <text x="220" y="230" fill="#ff6600" font-weight="bold" font-size="12">UNDER</text>
-                        
-                        <!-- Combined vector arrow -->
-                        <defs>
-                            <marker id="redArrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
-                            </marker>
-                        </defs>
-                        <line x1="140" y1="140" x2="260" y2="240" stroke="#e74c3c" stroke-width="3" marker-end="url(#redArrow)"/>
-                        
-                        <!-- Formula -->
-                        <text x="200" y="120" fill="#e74c3c" font-weight="bold" font-size="14">Down + Under = 복합 충돌 경로</text>
-                        
-                        <!-- Target area -->
-                        <ellipse cx="290" cy="250" rx="30" ry="20" fill="#ff3333" opacity="0.3"/>
-                        <text x="270" y="280" fill="#ff3333" font-weight="bold" font-size="12">충돌 목표점</text>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>Under 움직임 분석</h3>
-                    <ul>
-                        <li>관성에 의해 승객은 대시보드 아래 방향으로 이동합니다</li>
-                        <li>Down(수직) + Under(수평)의 복합 궤적을 따라 움직입니다</li>
-                        <li>수평 방향 궤적선으로 Under 경로를 강조합니다</li>
-                        <li>최종적으로 대시보드 하단부를 향한 복합 벡터가 형성됩니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>📐 물리학적 분석</h4>
-                        <p><strong>수직 성분:</strong> 중력 + 좌석 미끄러짐<br>
-                        <strong>수평 성분:</strong> 전방 관성력<br>
-                        <strong>합성 벡터:</strong> 대시보드 하단부 충돌 경로</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 슬라이드 4: 무릎 충돌 -->
-        <div class="slide" id="slide-3">
-            <div class="slide-header">
-                <div class="slide-title">4단계: 무릎 충돌</div>
-                <div class="slide-subtitle">Knee Impact - 1차 손상 발생</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Car interior -->
-                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
-                        
-                        <!-- Dashboard -->
-                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
-                        
-                        <!-- Passenger -->
-                        <g fill="#d4a574">
-                            <circle cx="200" cy="160" r="15"/>
-                            <rect x="185" y="175" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-15 200 200)"/>
-                            <rect x="180" y="225" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-10 186 245)"/>
-                            <rect x="208" y="225" width="12" height="40" rx="6" fill="#1a365d" transform="rotate(-10 214 245)"/>
-                        </g>
-                        
-                        <!-- Knee impact points -->
-                        <circle cx="290" cy="260" r="8" fill="#ff6b6b" class="impact-effect"/>
-                        <circle cx="295" cy="265" r="8" fill="#ff6b6b" class="impact-effect"/>
-                        
-                        <!-- Impact shockwave -->
-                        <circle cx="292" cy="262" r="20" fill="none" stroke="#ff3333" stroke-width="3" class="impact-effect"/>
-                        <circle cx="292" cy="262" r="35" fill="none" stroke="#ff6666" stroke-width="2" opacity="0.6" class="impact-effect"/>
-                        
-                        <!-- Impact force arrow -->
-                        <line x1="250" y1="262" x2="285" y2="262" stroke="#ff3333" stroke-width="5" marker-end="url(#redArrow)"/>
-                        <text x="220" y="250" fill="#ff3333" font-weight="bold" font-size="14">충격력</text>
-                        
-                        <!-- Damage labels -->
-                        <text x="310" y="250" fill="#e74c3c" font-weight="bold" font-size="12">1차 손상:</text>
-                        <text x="310" y="265" fill="#e74c3c" font-size="11">• 슬개골 골절</text>
-                        <text x="310" y="280" fill="#e74c3c" font-size="11">• 대퇴골 원위부 골절</text>
-                        <text x="310" y="295" fill="#e74c3c" font-size="11">• 인대 손상</text>
-                        
-                        <!-- Force magnitude indicator -->
-                        <rect x="350" y="140" width="80" height="25" fill="#ff3333" opacity="0.3" rx="5"/>
-                        <text x="355" y="157" fill="#ff3333" font-weight="bold" font-size="12">고에너지 충격</text>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>무릎 충돌 메커니즘</h3>
-                    <ul>
-                        <li>무릎이 대시보드 하단부에 강하게 충돌합니다</li>
-                        <li>슬개골 골절, 대퇴골 원위부 골절 등 하체 손상이 발생할 수 있습니다</li>
-                        <li>충격 포인트에 시각적 파동 애니메이션이 강조됩니다</li>
-                        <li>이때 발생하는 에너지는 다음 단계의 연쇄 손상을 유발합니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>🦴 주요 손상 패턴</h4>
-                        <p><strong>슬개골 골절:</strong> 직접적인 충돌 손상<br>
-                        <strong>대퇴골 골절:</strong> 축 방향 압축력<br>
-                        <strong>인대 손상:</strong> 과도한 굴곡과 압박</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 슬라이드 5: 에너지 전달 -->
-        <div class="slide" id="slide-4">
-            <div class="slide-header">
-                <div class="slide-title">5단계: 에너지 전달</div>
-                <div class="slide-subtitle">Energy Transfer - 연쇄 손상</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Car interior outline -->
-                        <rect x="50" y="100" width="350" height="200" rx="15" fill="none" stroke="#555" stroke-width="1" opacity="0.3"/>
-                        
-                        <!-- Human figure (X-ray style) -->
-                        <g fill="none" stroke="#87ceeb" stroke-width="2" opacity="0.6">
-                            <circle cx="200" cy="140" r="18"/>
-                            <rect x="180" y="160" width="40" height="60" rx="8"/>
-                            <rect x="185" y="220" width="30" height="20" rx="5"/>
-                        </g>
-                        
-                        <!-- Bone structure -->
-                        <g stroke="#fff" stroke-width="4" opacity="0.8">
-                            <!-- Femur bones -->
-                            <line x1="188" y1="230" x2="188" y2="280" stroke="#ff6666"/>
-                            <line x1="212" y1="230" x2="212" y2="280" stroke="#ff6666"/>
-                            <!-- Tibia bones -->
-                            <line x1="188" y1="280" x2="188" y2="320" stroke="#ff6666"/>
-                            <line x1="212" y1="280" x2="212" y2="320" stroke="#ff6666"/>
-                            <!-- Pelvis -->
-                            <ellipse cx="200" cy="220" rx="25" ry="10" stroke="#ff6666"/>
-                            <!-- Spine -->
-                            <line x1="200" y1="160" x2="200" y2="210" stroke="#ff6666"/>
-                        </g>
-                        
-                        <!-- Energy flow animation -->
-                        <g class="energy-flow">
-                            <circle cx="190" cy="320" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="300" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="280" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="260" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="240" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="220" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="200" r="4" fill="#ff3333"/>
-                            <circle cx="190" cy="180" r="4" fill="#ff3333"/>
-                        </g>
-                        
-                        <!-- Energy pathway arrows -->
-                        <defs>
-                            <marker id="energyArrow" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
-                                <polygon points="0 0, 8 3, 0 6" fill="#ff3333"/>
-                            </marker>
-                        </defs>
-                        <line x1="210" y1="320" x2="210" y2="180" stroke="#ff3333" stroke-width="3" marker-end="url(#energyArrow)"/>
-                        
-                        <!-- Anatomical labels -->
-                        <text x="250" y="180" fill="#e74c3c" font-weight="bold" font-size="12">척추</text>
-                        <text x="250" y="220" fill="#e74c3c" font-weight="bold" font-size="12">골반</text>
-                        <text x="250" y="260" fill="#e74c3c" font-weight="bold" font-size="12">대퇴골</text>
-                        <text x="250" y="300" fill="#e74c3c" font-weight="bold" font-size="12">경골</text>
-                        
-                        <!-- Damage progression -->
-                        <text x="280" y="140" fill="#ff3333" font-weight="bold" font-size="11">연쇄 손상:</text>
-                        <text x="280" y="155" fill="#ff3333" font-size="10">• 고관절 탈구</text>
-                        <text x="280" y="170" fill="#ff3333" font-size="10">• 비구 골절</text>
-                        <text x="280" y="185" fill="#ff3333" font-size="10">• 요추 압박골절</text>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>에너지 전달 메커니즘</h3>
-                    <ul>
-                        <li>충격 에너지가 다리를 따라 골반, 척추로 전달됩니다</li>
-                        <li>빨간색 펄스 선이 대퇴골에서 고관절, 척추 방향으로 이동합니다</li>
-                        <li>고관절 탈구, 비구 골절, 요추 압박골절 위험이 있습니다</li>
-                        <li>X-ray 스타일의 시각화로 뼈 구조와 에너지 경로를 명확히 표현합니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>⚡ 연쇄 손상 패턴</h4>
-                        <p><strong>1차:</strong> 무릎 → 대퇴골<br>
-                        <strong>2차:</strong> 대퇴골 → 고관절<br>
-                        <strong>3차:</strong> 골반 → 척추<br>
-                        <strong>최종:</strong> 복부 장기 손상 가능</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 슬라이드 6: 상체 손상 -->
-        <div class="slide" id="slide-5">
-            <div class="slide-header">
-                <div class="slide-title">6단계: 상체 손상</div>
-                <div class="slide-subtitle">Torso Forward - 2차 충돌</div>
-            </div>
-            <div class="slide-content">
-                <div class="slide-visual">
-                    <svg class="visual-svg" viewBox="0 0 450 350">
-                        <!-- Car interior -->
-                        <rect x="50" y="100" width="350" height="200" rx="15" fill="#333" fill-opacity="0.1" stroke="#555" stroke-width="2"/>
-                        
-                        <!-- Dashboard and steering wheel -->
-                        <path d="M 280 120 Q 320 120 320 160 L 320 220 L 280 220 Z" fill="#2a2a2a"/>
-                        <circle cx="300" cy="170" r="25" fill="#444" stroke="#666" stroke-width="3"/>
-                        
-                        <!-- Passenger (extreme forward position) -->
-                        <g fill="#d4a574">
-                            <circle cx="250" cy="150" r="15"/>
-                            <rect x="235" y="165" width="30" height="50" rx="5" fill="#3498db" transform="rotate(-25 250 190)"/>
-                            <rect x="230" y="175" width="10" height="30" rx="5" transform="rotate(-40 235 190)"/>
-                            <rect x="255" y="175" width="10" height="30" rx="5" transform="rotate(10 260 190)"/>
-                        </g>
-                        
-                        <!-- Legs stopped at dashboard -->
-                        <rect x="285" y="230" width="12" height="50" rx="6" fill="#1a365d"/>
-                        <rect x="305" y="230" width="12" height="50" rx="6" fill="#1a365d"/>
-                        
-                        <!-- Secondary impact zones -->
-                        <circle cx="275" cy="170" r="6" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
-                        <circle cx="270" cy="155" r="5" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
-                        <circle cx="265" cy="175" r="5" fill="#ff6b6b" opacity="0.8" class="impact-effect"/>
-                        
-                        <!-- Risk zone -->
-                        <ellipse cx="290" cy="165" rx="40" ry="25" fill="#ff3333" opacity="0.2"/>
-                        
-                        <!-- Motion arrows -->
-                        <line x1="180" y1="150" x2="240" y2="150" stroke="#e74c3c" stroke-width="4" marker-end="url(#redArrow)"/>
-                        <line x1="180" y1="190" x2="225" y2="190" stroke="#e74c3c" stroke-width="4" marker-end="url(#redArrow)"/>
-                        
-                        <!-- Body part labels with risk indicators -->
-                        <text x="350" y="140" fill="#e74c3c" font-weight="bold" font-size="12">2차 손상 위험:</text>
-                        <text x="350" y="160" fill="#e74c3c" font-size="11">🧠 두부 외상</text>
-                        <text x="350" y="180" fill="#e74c3c" font-size="11">🦴 경추 손상</text>
-                        <text x="350" y="200" fill="#e74c3c" font-size="11">🫁 흉부 압박</text>
-                        <text x="350" y="220" fill="#e74c3c" font-size="11">🩸 내장 손상</text>
-                        
-                        <!-- Danger zone label -->
-                        <text x="250" y="130" fill="#ff3333" font-weight="bold" font-size="14">위험 구역</text>
-                        
-                        <!-- Fixed lower body indicator -->
-                        <text x="320" y="250" fill="#2c3e50" font-size="10">하체 고정</text>
-                        <line x1="290" y1="255" x2="320" y2="255" stroke="#2c3e50" stroke-width="2"/>
-                    </svg>
-                </div>
-                <div class="slide-description">
-                    <h3>상체 손상 메커니즘</h3>
-                    <ul>
-                        <li>하체가 멈춘 후에도 상체는 관성으로 계속 앞으로 나아갑니다</li>
-                        <li>스티어링 휠 또는 차량 내부와 2차 충돌이 발생할 수 있습니다</li>
-                        <li>흉부, 경추, 두부에 심각한 손상이 생길 수 있습니다</li>
-                        <li>상체와 하체 사이의 극심한 굴곡으로 척추 손상 위험이 증가합니다</li>
-                    </ul>
-                    <div class="key-points">
-                        <h4>🚨 중대한 2차 손상</h4>
-                        <p><strong>두부:</strong> 뇌진탕, 두개골 골절<br>
-                        <strong>경추:</strong> Whiplash, 경추 탈구<br>
-                        <strong>흉부:</strong> 늑골 골절, 폐 손상<br>
-                        <strong>복부:</strong> 내장 파열, 대동맥 손상</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button class="control-btn" onclick="previousSlide()">◀ 이전</button>
-            <button class="control-btn" onclick="nextSlide()">다음 ▶</button>
-            <button class="control-btn" onclick="playSlideshow()">▶ 자동 재생</button>
-            <button class="control-btn print-btn" onclick="printSlides()">🖨 인쇄용 출력</button>
-        </div>
+            # 결과 다운로드
+            if st.button("💾 결과 저장하기", key="download_button"):
+                result_data = {
+                    "측정일": datetime.now().strftime('%Y년 %m월 %d일 %H시 %M분'),
+                    "이름": name if name else "익명",
+                    "직업": job,
+                    "부서": department,
+                    "경력": experience,
+                    "개인적_번아웃": f"{personal_avg:.2f}점",
+                    "업무관련_번아웃": f"{work_avg:.2f}점", 
+                    "환자관련_번아웃": f"{client_avg:.2f}점",
+                    "전체_평균": f"{overall_avg:.2f}점"
+                }
+                
+                df = pd.DataFrame([result_data])
+                csv = df.to_csv(index=False, encoding='utf-8-sig')
+                
+                st.download_button(
+                    label="📄 CSV 파일로 다운로드",
+                    data=csv,
+                    file_name=f"CBI_번아웃측정결과_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                    mime="text/csv"
+                )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 푸터
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 10px; margin-top: 2rem;">
+        <p style="color: #8b4513; margin: 0;">
+            📧 문의사항이 있으시면 언제든 연락해주세요 | 
+            🔒 모든 데이터는 안전하게 보호됩니다 | 
+            📋 CBI는 과학적으로 검증된 측정 도구입니다
+        </p>
     </div>
+    """, unsafe_allow_html=True)
 
-    <script>
-        let currentSlide = 0;
-        let totalSlides = 6;
-        let isPlaying = false;
-        let playInterval;
-
-        function showSlide(index) {
-            // Hide all slides
-            for (let i = 0; i < totalSlides; i++) {
-                document.getElementById(`slide-${i}`).classList.remove('active');
-                document.querySelectorAll('.slide-nav-btn')[i].classList.remove('active');
-            }
-            
-            // Show selected slide
-            document.getElementById(`slide-${index}`).classList.add('active');
-            document.querySelectorAll('.slide-nav-btn')[index].classList.add('active');
-            
-            currentSlide = index;
-        }
-
-        function nextSlide() {
-            const next = (currentSlide + 1) % totalSlides;
-            showSlide(next);
-        }
-
-        function previousSlide() {
-            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
-            showSlide(prev);
-        }
-
-        function playSlideshow() {
-            if (isPlaying) {
-                clearInterval(playInterval);
-                isPlaying = false;
-                document.querySelector('.control-btn:nth-child(3)').textContent = '▶ 자동 재생';
-            } else {
-                isPlaying = true;
-                document.querySelector('.control-btn:nth-child(3)').textContent = '⏸ 정지';
-                playInterval = setInterval(() => {
-                    nextSlide();
-                }, 4000);
-            }
-        }
-
-        function printSlides() {
-            window.print();
-        }
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (!isPlaying) {
-                if (e.key === 'ArrowRight' || e.key === ' ') {
-                    e.preventDefault();
-                    nextSlide();
-                } else if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    previousSlide();
-                }
-            }
-            
-            if (e.key === 'Escape') {
-                if (isPlaying) {
-                    playSlideshow();
-                }
-            }
-        });
-
-        // Initialize
-        window.addEventListener('load', function() {
-            showSlide(0);
-        });
-
-        // Touch navigation for mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        document.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            if (touchEndX < touchStartX - 50) {
-                nextSlide();
-            }
-            if (touchEndX > touchStartX + 50) {
-                previousSlide();
-            }
-        }
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    main()

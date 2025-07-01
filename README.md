@@ -1,194 +1,640 @@
-# 🏥 AIS & ISS 외상점수체계를 알아볼까요? 
 
-**학생간호사 및 신규간호사를 위한 외상 중증도 평가 가이드**
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporal Topic Analysis - Trauma Nursing Research</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 32px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 40px;
+            font-size: 24px;
+        }
+        .analysis-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .summary-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .summary-value {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+        .summary-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .chart-container {
+            margin: 30px 0;
+            padding: 25px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            background-color: #fdfdfd;
+        }
+        .chart-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .trend-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .trend-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .trend-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .trend-stats {
+            font-size: 14px;
+            color: #34495e;
+        }
+        .trend-up {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .trend-down {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .trend-stable {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        .insights-box {
+            background-color: #ecf0f1;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .insights-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .heatmap-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .heatmap-table th, .heatmap-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .heatmap-table th {
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        .heat-very-high { background-color: #8B0000; color: white; }
+        .heat-high { background-color: #DC143C; color: white; }
+        .heat-medium { background-color: #FF6347; color: white; }
+        .heat-low { background-color: #FFB6C1; color: black; }
+        .heat-very-low { background-color: #F0F8FF; color: black; }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .control-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .control-button:hover {
+            background: #2980b9;
+        }
+        .control-button.active {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Temporal Analysis of Topics in Trauma Nursing Research</h1>
+        
+        <!-- 분석 요약 -->
+        <div class="analysis-summary">
+            <h3>Analysis Overview</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-value">10</span>
+                    <span class="summary-label">Years Analyzed</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">2015-2024</span>
+                    <span class="summary-label">Year Range</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">423</span>
+                    <span class="summary-label">Total Documents</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">10</span>
+                    <span class="summary-label">Topics Identified</span>
+                </div>
+            </div>
+        </div>
 
----
+        <!-- 연도별 토픽 분포 추세 -->
+        <h2>1. Topic Distribution Trends Over Time</h2>
+        <div class="chart-container">
+            <div class="chart-title">Topic Proportions by Year (Line Chart)</div>
+            <canvas id="topicTrendsChart" width="1200" height="600"></canvas>
+        </div>
 
-## 📊 AIS (Abbreviated Injury Scale) 점수 체계
+        <!-- 연도별 문서 수 -->
+        <h2>2. Publication Volume Over Time</h2>
+        <div class="chart-container">
+            <div class="chart-title">Number of Documents by Year</div>
+            <canvas id="documentVolumeChart" width="1200" height="400"></canvas>
+        </div>
 
-> 각각의 개별 손상에 대해 1점부터 6점까지 중증도를 평가하는 척도
+        <!-- 토픽별 변화율 분석 -->
+        <h2>3. Topic Change Rate Analysis</h2>
+        <div class="trend-analysis" id="trendAnalysis">
+            <!-- 동적으로 생성됨 -->
+        </div>
 
-### AIS 점수별 상세 분류
+        <!-- 히트맵 -->
+        <h2>4. Topic-Year Heatmap</h2>
+        <div class="chart-container">
+            <div class="chart-title">Topic Intensity by Year</div>
+            <div class="heatmap-container" id="heatmapContainer">
+                <!-- 동적으로 생성됨 -->
+            </div>
+        </div>
 
-#### 🟢 AIS 1점 - 경미한 손상 (Minor)
-- **특징:** 생명에 위험이 없는 가벼운 손상
-- **예시:** 표면적 찰과상, 경미한 타박상, 1도 화상
-- **간호 포인트:** 기본적인 상처 치료와 감염 예방에 집중
+        <!-- 상관관계 분석 -->
+        <h2>5. Topic Correlation Matrix</h2>
+        <div class="chart-container">
+            <div class="chart-title">Correlation Between Topics Over Time</div>
+            <canvas id="correlationChart" width="800" height="800"></canvas>
+        </div>
 
-#### 🟡 AIS 2점 - 중등도 손상 (Moderate)
-- **특징:** 심각하지만 생명에 즉각적 위험은 없는 손상
-- **예시:** 단순 골절, 2도 화상, 경미한 뇌진탕
-- **간호 포인트:** 통증 관리와 합병증 예방 모니터링
+        <!-- 인사이트 -->
+        <div class="insights-box">
+            <div class="insights-title">Key Insights:</div>
+            <div id="insights">
+                <!-- 동적으로 생성됨 -->
+            </div>
+        </div>
 
-#### 🟠 AIS 3점 - 심각한 손상 (Serious)
-- **특징:** 생명에 위험은 없지만 심각한 손상
-- **예시:** 복합 골절, 3도 화상(소범위), 중등도 뇌진탕
-- **간호 포인트:** 집중적인 관찰과 적극적인 치료 지원
+        <!-- 상세 주제 정보 -->
+        <h2>6. Topic Details and Evolution</h2>
+        <div class="chart-container">
+            <div class="controls">
+                <button class="control-button active" onclick="showAllTopics()">All Topics</button>
+                <button class="control-button" onclick="showTopTrending()">Top Trending</button>
+                <button class="control-button" onclick="showMostStable()">Most Stable</button>
+            </div>
+            <canvas id="detailedTrendsChart" width="1200" height="500"></canvas>
+        </div>
+    </div>
 
-#### 🔴 AIS 4점 - 중증 손상 (Severe)
-- **특징:** 생명을 위협할 수 있는 심각한 손상
-- **예시:** 대량 출혈, 장기 파열, 중증 뇌외상
-- **간호 포인트:** 지속적인 활력징후 모니터링, 응급처치 준비
+    <script>
+        // 데이터 설정
+        const yearlyData = {"years": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "topics": [{"values": [15.34279740318813, 11.815023733006754, 5.099622700260141, 11.757363342549302, 11.7096062007263, 11.710442969266968, 11.210636403834165, 8.769304710691951, 9.459589450377571, 8.35766873312337]}, {"values": [5.250336532662052, 9.001173841485638, 9.660357799509258, 7.8381167083627385, 10.337682422297023, 9.477407785371177, 12.091985857847718, 14.812367331637422, 11.569021167651119, 10.645176277640752]}, {"values": [15.84391670859159, 4.417940381941795, 11.606089856879231, 10.771598812751753, 13.118141917116446, 16.33733144566577, 15.39218457416777, 14.905129524266941, 8.400592576229664, 9.205804695354843]}, {"values": [4.840187895250541, 11.077022458811829, 5.628622782259396, 8.870964107511739, 9.724122102689307, 9.126006903218551, 11.988507689117588, 9.41522423883003, 10.140918123705314, 8.208811717064787]}, {"values": [6.0477934692856605, 8.660312442086123, 7.182326678380317, 8.122636869118171, 4.818367740440251, 7.685858636199668, 1.7632634852733753, 6.56489323961663, 3.1546213717013263, 4.181727033947381]}, {"values": [4.974728938761797, 7.390885572341841, 9.35020835398445, 7.3148687732842905, 7.404851757039807, 5.645875592109072, 8.839305771264529, 3.1248237848016767, 12.158488927145914, 9.999697173917742]}, {"values": [13.408361092089946, 11.16945153795648, 18.264386956843598, 13.21355912853091, 15.039405495269914, 11.42335690868556, 11.804754128938718, 15.979484964890577, 16.299318003823206, 16.070159286357804]}, {"values": [7.409390969430945, 6.10126124542953, 8.270568693874452, 11.405699258127118, 6.285963942582851, 9.421272896213486, 8.27110818710986, 8.355242437135345, 10.521670638717733, 10.455575946101572]}, {"values": [17.794178217537947, 22.882431036133468, 18.23572301528636, 16.1016708386662, 16.72792101079829, 10.496493856101218, 11.088568447976682, 15.189257922809855, 15.104390316928177, 15.450000791405449]}, {"values": [9.08830877320139, 7.484497750806543, 6.7020931627228, 4.603522161097774, 4.833937411039808, 8.67595300716853, 7.5496854544695955, 2.8842718453195766, 3.1913894237199676, 7.425378345086305]}]};
+        const topicNames = ["improvement + performance + time", "stress + disorder + burnout", "mortality + iss + admission", "pediatric + child + prevention", "pain + violence + safety", "blood + transfusion + time", "level + from + center", "screen + discharge + intervention", "education + training + team", "fracture + vehicle + txa"];
+        const yearlyStats = {"document_counts": [34, 39, 42, 47, 40, 48, 45, 43, 44, 41]};
+        const correlationData = [[1.0, -0.5566798002081472, 0.23969260453959523, 0.06535779887788842, 0.06280431268417236, -0.41045475070395876, -0.7421511553855706, -0.2556803800633391, 0.0006508524039378462, 0.355780645042817], [-0.5566798002081472, 1.0, 0.04307141803290648, 0.5633496878539218, -0.396751248227261, 0.05612609863105039, 0.3102931608111016, 0.07975303798336118, -0.3576598544366106, -0.5985118854330863], [0.23969260453959523, 0.04307141803290648, 1.0, -0.2512553132577901, -0.18281173717967666, -0.5409499056344873, -0.08678082656952954, -0.030448799208388753, -0.6800227124242101, 0.19050389834980755], [0.06535779887788842, 0.5633496878539218, -0.2512553132577901, 1.0, -0.30740727658293177, 0.17900611403057107, -0.4503281587569955, -0.038240448843678165, -0.23465958945738513, -0.29821434322265716], [0.06280431268417236, -0.396751248227261, -0.18281173717967666, -0.30740727658293177, 1.0, -0.509020892767659, -0.18529544120987063, -0.12299112737907512, 0.4820768256853226, 0.11844145848625726], [-0.41045475070395876, 0.05612609863105039, -0.5409499056344873, 0.17900611403057107, -0.509020892767659, 1.0, 0.32389485695461023, 0.35416046404923807, 0.006052546446221611, -0.10245024205717637], [-0.7421511553855706, 0.3102931608111016, -0.08678082656952954, -0.4503281587569955, -0.18529544120987063, 0.32389485695461023, 1.0, 0.20546876033295697, 0.1313020113616996, -0.4939204526486581], [-0.2556803800633391, 0.07975303798336118, -0.030448799208388753, -0.038240448843678165, -0.12299112737907512, 0.35416046404923807, 0.20546876033295697, 1.0, -0.47144834659875606, -0.25905832870942064], [0.0006508524039378462, -0.3576598544366106, -0.6800227124242101, -0.23465958945738513, 0.4820768256853226, 0.006052546446221611, 0.1313020113616996, -0.47144834659875606, 1.0, -0.021559186359233887], [0.355780645042817, -0.5985118854330863, 0.19050389834980755, -0.29821434322265716, 0.11844145848625726, -0.10245024205717637, -0.4939204526486581, -0.25905832870942064, -0.021559186359233887, 1.0]];
+        const trendAnalysis = [{"change_rate": -0.03607906966742481, "peak_year": 2015, "avg_proportion": 10.523205564702465}, {"change_rate": 0.06271662842495568, "peak_year": 2022, "avg_proportion": 10.06836257244649}, {"change_rate": 0.0008645053026752979, "peak_year": 2020, "avg_proportion": 11.99987304929658}, {"change_rate": 0.03502936528401299, "peak_year": 2021, "avg_proportion": 8.902038801845908}, {"change_rate": -0.07774193119137443, "peak_year": 2016, "avg_proportion": 5.81818009660489}, {"change_rate": 0.03999275046877146, "peak_year": 2023, "avg_proportion": 7.620373464465112}, {"change_rate": 0.017245832730671415, "peak_year": 2017, "avg_proportion": 14.267223750338673}, {"change_rate": 0.03679439371729778, "peak_year": 2018, "avg_proportion": 8.649775421472288}, {"change_rate": -0.042689989371888636, "peak_year": 2016, "avg_proportion": 15.907063545364366}, {"change_rate": -0.04991703660683065, "peak_year": 2015, "avg_proportion": 6.243903733463229}];
 
-#### 🟣 AIS 5점 - 위험한 손상 (Critical)
-- **특징:** 생존이 불확실한 매우 위험한 손상
-- **예시:** 대동맥 파열, 광범위한 화상, 중증 뇌손상
-- **간호 포인트:** 집중치료실 수준의 간호, 가족 지지
+        // 색상 팔레트
+        const colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+        ];
 
-#### ⚫ AIS 6점 - 최대 중증 (Maximum)
-- **특징:** 현재 의학 기술로는 치료가 불가능한 치명적 손상
-- **예시:** 뇌간 완전 손상, 심장 완전 파열
-- **간호 포인트:** 완화 간호, 존엄사 지원
+        // 1. 토픽 추세 차트
+        const ctx1 = document.getElementById('topicTrendsChart').getContext('2d');
+        const trendsChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: yearlyData.years,
+                datasets: yearlyData.topics.map((topic, index) => ({
+                    label: `Topic ${index + 1}: ${topicNames[index]}`,
+                    data: topic.values,
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length] + '20',
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }))
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Topic Proportion (%)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 10
+                            },
+                            boxWidth: 12
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Year: ' + context[0].label;
+                            },
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
----
+        // 2. 문서 볼륨 차트
+        const ctx2 = document.getElementById('documentVolumeChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: yearlyData.years,
+                datasets: [{
+                    label: 'Number of Documents',
+                    data: yearlyStats.document_counts,
+                    backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Document Count',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
 
-## 🫁 ISS 6개 신체 영역
+        // 3. 추세 분석 카드 생성
+        function createTrendAnalysis() {
+            const container = document.getElementById('trendAnalysis');
+            
+            trendAnalysis.forEach((trend, index) => {
+                const card = document.createElement('div');
+                card.className = 'trend-card';
+                
+                let trendClass = 'trend-stable';
+                let trendText = 'Stable';
+                if (trend.change_rate > 0.1) {
+                    trendClass = 'trend-up';
+                    trendText = 'Increasing';
+                } else if (trend.change_rate < -0.1) {
+                    trendClass = 'trend-down';
+                    trendText = 'Decreasing';
+                }
+                
+                card.innerHTML = `
+                    <div class="trend-title">Topic ${index + 1}: ${topicNames[index]}</div>
+                    <div class="trend-stats">
+                        <div>Trend: <span class="${trendClass}">${trendText}</span></div>
+                        <div>Change Rate: <span class="${trendClass}">${(trend.change_rate * 100).toFixed(1)}%</span></div>
+                        <div>Peak Year: ${trend.peak_year}</div>
+                        <div>Avg Proportion: ${trend.avg_proportion.toFixed(1)}%</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
 
-> 인체를 6개 영역으로 나누어 각 영역에서 가장 높은 AIS 점수를 사용
+        // 4. 히트맵 생성
+        function createHeatmap() {
+            const container = document.getElementById('heatmapContainer');
+            
+            let html = '<table class="heatmap-table"><thead><tr><th>Topic</th>';
+            yearlyData.years.forEach(year => {
+                html += `<th>${year}</th>`;
+            });
+            html += '</tr></thead><tbody>';
 
-### 1️⃣ 머리 또는 목 (Head or Neck)
-- **포함 범위:** 뇌, 두개골, 경추 척추
-- **주요 손상:** 뇌출혈, 두개골 골절, 경추 손상
-- **간호 핵심:** 신경학적 사정, 뇌압 모니터링, 경추 고정
+            yearlyData.topics.forEach((topic, topicIndex) => {
+                html += `<tr><td><strong>Topic ${topicIndex + 1}</strong></td>`;
+                topic.values.forEach(value => {
+                    let heatClass = 'heat-very-low';
+                    if (value > 20) heatClass = 'heat-very-high';
+                    else if (value > 15) heatClass = 'heat-high';
+                    else if (value > 10) heatClass = 'heat-medium';
+                    else if (value > 5) heatClass = 'heat-low';
+                    
+                    html += `<td class="${heatClass}">${value.toFixed(1)}%</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
 
-### 2️⃣ 얼굴 (Face)
-- **포함 범위:** 안면골, 코, 입, 눈, 귀
-- **주요 손상:** 안면골 골절, 치아 손상, 안구 손상
-- **간호 핵심:** 기도 확보, 출혈 조절, 감염 예방
+        // 5. 상관관계 매트릭스
+        const ctx5 = document.getElementById('correlationChart').getContext('2d');
+        new Chart(ctx5, {
+            type: 'scatter',
+            data: {
+                datasets: correlationData.map((corr, index) => ({
+                    label: `Topic ${index + 1} Correlations`,
+                    data: corr.map((value, i) => ({x: i, y: index, v: value})),
+                    backgroundColor: function(context) {
+                        const value = context.parsed.v;
+                        const alpha = Math.abs(value);
+                        return value > 0 ? `rgba(231, 76, 60, ${alpha})` : `rgba(52, 152, 219, ${alpha})`;
+                    },
+                    pointRadius: 15
+                }))
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: 0,
+                        max: 10 - 1,
+                        title: {
+                            display: true,
+                            text: 'Topic Index'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        min: 0,
+                        max: 10 - 1,
+                        title: {
+                            display: true,
+                            text: 'Topic Index'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Correlation: ${context.parsed.v.toFixed(3)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-### 3️⃣ 흉부 (Chest)
-- **포함 범위:** 흉곽, 폐, 심장, 흉추, 횡격막
-- **주요 손상:** 기흉, 혈흉, 늑골 골절, 심장 손상
-- **간호 핵심:** 호흡 상태 모니터링, 흉관 관리
+        // 6. 상세 추세 차트 (제어 가능)
+        let detailedChart;
+        
+        function createDetailedChart(selectedTopics) {
+            if (detailedChart) {
+                detailedChart.destroy();
+            }
+            
+            const ctx6 = document.getElementById('detailedTrendsChart').getContext('2d');
+            detailedChart = new Chart(ctx6, {
+                type: 'line',
+                data: {
+                    labels: yearlyData.years,
+                    datasets: selectedTopics.map(index => ({
+                        label: `Topic ${index + 1}: ${topicNames[index]}`,
+                        data: yearlyData.topics[index].values,
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: colors[index % colors.length] + '30',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        borderWidth: 3
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Topic Proportion (%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-### 4️⃣ 복부 또는 골반 내용물 (Abdomen or Pelvic Contents)
-- **포함 범위:** 복부 장기, 요추 척추
-- **주요 손상:** 간 파열, 비장 손상, 장 손상
-- **간호 핵심:** 내출혈 모니터링, 복부 팽만 관찰
+        // 컨트롤 함수들
+        function showAllTopics() {
+            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            createDetailedChart([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        }
 
-### 5️⃣ 사지 또는 골반 골격 (Extremities or Pelvic Girdle)
-- **포함 범위:** 팔, 다리, 골반뼈
-- **주요 손상:** 사지 골절, 골반 골절, 혈관 손상
-- **간호 핵심:** 순환 상태 확인, 구획증후군 예방
+        function showTopTrending() {
+            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 변화율이 높은 상위 5개 토픽
+            const topTrending = trendAnalysis
+                .map((trend, index) => ({index, change_rate: trend.change_rate}))
+                .sort((a, b) => Math.abs(b.change_rate) - Math.abs(a.change_rate))
+                .slice(0, 5)
+                .map(item => item.index);
+            
+            createDetailedChart(topTrending);
+        }
 
-### 6️⃣ 체표 (External)
-- **포함 범위:** 피부, 피하조직
-- **주요 손상:** 화상, 열상, 압궤상
-- **간호 핵심:** 상처 관리, 감염 예방, 체온 유지
+        function showMostStable() {
+            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 변화율이 낮은 상위 5개 토픽
+            const mostStable = trendAnalysis
+                .map((trend, index) => ({index, change_rate: Math.abs(trend.change_rate)}))
+                .sort((a, b) => a.change_rate - b.change_rate)
+                .slice(0, 5)
+                .map(item => item.index);
+            
+            createDetailedChart(mostStable);
+        }
 
----
+        // 인사이트 생성
+        function generateInsights() {
+            const insights = [];
+            
+            // 가장 급성장하는 토픽
+            const fastestGrowing = trendAnalysis.reduce((max, trend, index) => 
+                trend.change_rate > max.change_rate ? {...trend, index} : max
+            );
+            insights.push(`<strong>Fastest Growing Topic:</strong> Topic ${fastestGrowing.index + 1} (${topicNames[fastestGrowing.index]}) with ${(fastestGrowing.change_rate * 100).toFixed(1)}% growth rate.`);
+            
+            // 가장 감소하는 토픽
+            const fastestDeclining = trendAnalysis.reduce((min, trend, index) => 
+                trend.change_rate < min.change_rate ? {...trend, index} : min
+            );
+            insights.push(`<strong>Fastest Declining Topic:</strong> Topic ${fastestDeclining.index + 1} (${topicNames[fastestDeclining.index]}) with ${(fastestDeclining.change_rate * 100).toFixed(1)}% decline rate.`);
+            
+            // 가장 안정적인 토픽
+            const mostStable = trendAnalysis.reduce((min, trend, index) => 
+                Math.abs(trend.change_rate) < Math.abs(min.change_rate) ? {...trend, index} : min
+            );
+            insights.push(`<strong>Most Stable Topic:</strong> Topic ${mostStable.index + 1} (${topicNames[mostStable.index]}) with minimal change (${(mostStable.change_rate * 100).toFixed(1)}%).`);
+            
+            // 연구 활동이 가장 활발한 연도
+            const maxDocsIndex = yearlyStats.document_counts.indexOf(Math.max(...yearlyStats.document_counts));
+            const peakYear = yearlyData.years[maxDocsIndex];
+            insights.push(`<strong>Peak Research Year:</strong> ${peakYear} with ${yearlyStats.document_counts[maxDocsIndex]} documents published.`);
+            
+            document.getElementById('insights').innerHTML = insights.join('<br><br>');
+        }
 
-## 🧮 ISS 계산법
-
-### 단계별 계산 과정
-
-1. **1단계: 손상 분류**
-   - 환자의 모든 손상을 6개 영역별로 분류
-
-2. **2단계: AIS 점수 결정**
-   - 각 영역에서 가장 높은 AIS 점수 찾기
-
-3. **3단계: 상위 3개 선택**
-   - 가장 높은 점수 3개 영역 선택
-
-4. **4단계: 제곱 후 합산**
-   - 각각을 제곱한 후 모두 더하기
-
-### 📋 실제 계산 예시
-
-| 신체 영역 | 손상 내용 | AIS 점수 | 제곱값 |
-|----------|----------|----------|--------|
-| 머리/목 | 중등도 뇌진탕 | 4 | 16 |
-| 흉부 | 늑골 골절 (다발성) | 3 | 9 |
-| 복부 | 비장 열상 | 2 | 4 |
-| 사지 | 대퇴골 골절 | 3 | - |
-
-**🎯 최종 계산:** ISS = 16 + 9 + 4 = **29점**
-
----
-
-## 📈 ISS 점수별 중증도 해석
-
-### 중증도 분류
-
-| 점수 범위 | 중증도 | 치료 방향 | 설명 |
-|----------|--------|----------|------|
-| 💚 1-8점 | 경증 외상 | 외래 치료 가능 | 기본 상처 관리, 환자 교육 |
-| 💛 9-15점 | 중등도 외상 | 입원 치료 필요 | 합병증 예방, 재활 계획 |
-| 🧡 16-24점 | 중증 외상 | 집중치료 고려 | 집중 모니터링, 다학제 협력 |
-| 💜 25점 이상 | 최중증 외상 | 집중치료실 필수 | 생명 유지, 가족 지지 |
-
----
-
-## 💡 간호실무 핵심 포인트
-
-### 🚨 응급실에서
-- ✅ 환자 도착 즉시 1차 평가로 AIS 점수 산정
-- ✅ ISS 계산으로 치료 우선순위 결정
-- ✅ 중증도에 따른 병실 배정 결정
-
-### 🏥 병동에서
-- ✅ 환자 인수인계 시 ISS 점수 확인
-- ✅ 합병증 발생 위험도 예측
-- ✅ 간호 계획 수립의 기준점 활용
-
-### 🔍 평가 시 주의사항
-- ⚠️ 모든 손상을 놓치지 않고 평가
-- ⚠️ 지연성 손상 가능성 염두
-- ⚠️ 정확한 해부학적 지식 필요
-
-### 📊 해석 시 주의사항
-- ⚠️ 점수가 낮다고 방심 금물
-- ⚠️ 단일 장기 손상도 치명적일 수 있음
-- ⚠️ 환자 상태는 지속적으로 변화
-
----
-
-## 🎯 임상 적용 가이드
-
-### AIS 평가 시 체크포인트
-- [ ] 손상 기전 파악
-- [ ] 전신 사정 완료
-- [ ] 각 손상별 AIS 점수 산정
-- [ ] 동반 손상 확인
-
-### ISS 계산 시 체크포인트
-- [ ] 6개 영역별 분류 완료
-- [ ] 각 영역 최고점수 확인
-- [ ] 상위 3개 영역 선택
-- [ ] 제곱 후 합산 정확성 확인
-
-### 간호 기록 시 포함사항
-- ✍️ 손상 기전 및 시간
-- ✍️ AIS 점수별 손상 내용
-- ✍️ 계산된 ISS 점수
-- ✍️ 중증도에 따른 간호 계획
-
----
-
-## ⚠️ 중요한 기억사항
-
-> **"숫자 뒤에는 소중한 생명이 있습니다"**
-
-- 📌 점수는 도구일 뿐, 환자 중심의 전인적 간호가 가장 중요
-- 📌 지속적인 재평가와 상태 변화 모니터링 필수
-- 📌 다학제 팀과의 원활한 의사소통 중요
-- 📌 가족에 대한 정서적 지지도 간과하지 말 것
-
----
-
-## 📚 추가 학습 자료
-
-### 권장 참고문헌
-- Association for the Advancement of Automotive Medicine (AAAM) AIS 2005
-- Baker SP, et al. The Injury Severity Score: a method for describing patients with multiple injuries
-- 대한외상학회 외상 진료 지침서
-
-### 온라인 리소스
-- www.aaam.org (AIS 공식 웹사이트)
-- 대한간호협회 외상간호 가이드라인
-- 응급의학회 외상 처치 프로토콜
-
----
-
-*본 매뉴얼은 근거기반 간호실무를 위한 교육자료입니다. 환자안전을 최우선으로 하는 간호를 제공합시다.* 💙
+        // 초기화
+        createTrendAnalysis();
+        createHeatmap();
+        createDetailedChart([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        generateInsights();
+    </script>
+</body>
+</html>

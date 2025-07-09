@@ -67,6 +67,14 @@
             margin-bottom: 2rem;
         }
         
+        /* 상단 3개 카드를 위한 특별한 그리드 */
+        .dashboard-grid-top {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
         /* 카드 기본 스타일 */
         .card {
             background: white;
@@ -357,6 +365,12 @@
         }
         
         /* 반응형 디자인 */
+        @media (max-width: 1200px) {
+            .dashboard-grid-top {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
@@ -387,7 +401,7 @@
             </div>
             <div class="user-info">
                 <span><i class="fas fa-clock"></i> 2024.03.15 14:30</span>
-                <span><i class="fas fa-user"></i> 김간호 (TICU-A)</span>
+                <span><i class="fas fa-user"></i> 김민수간호사 (TICU-A)</span>
                 <button class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white;">
                     <i class="fas fa-sign-out-alt"></i> 로그아웃
                 </button>
@@ -397,8 +411,8 @@
 
     <!-- 메인 컨테이너 -->
     <div class="container">
-        <!-- 요약 정보 -->
-        <div class="dashboard-grid">
+        <!-- 요약 정보 - 상단 3개 카드를 한 행에 배치 -->
+        <div class="dashboard-grid-top">
             <!-- 전체 환자 현황 -->
             <div class="card">
                 <div class="card-header">
@@ -516,14 +530,14 @@
                     <h2 class="card-title">
                         <i class="fas fa-kidneys" style="color: #9c27b0;"></i> AKI 위험도 분석
                     </h2>
-                    <select class="btn btn-secondary" id="akiPatientSelect" style="font-size: 0.9rem;">
+                    <select class="btn btn-secondary" id="akiPatientSelect2" style="font-size: 0.9rem;">
                         <option value="bed1">BED1 박OO</option>
                         <option value="bed5">BED5 이OO</option>
                         <option value="bed8">BED8 김OO</option>
                     </select>
                 </div>
                 <!-- 환자 정보 표시 -->
-                <div id="akiPatientInfo" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                <div id="akiPatientInfo2" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                         <span><strong>BED1</strong> 박OO (65세/남)</span>
                         <span>ISS: 28점</span>
@@ -534,23 +548,23 @@
                 <div style="margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <span style="font-weight: 500;">48시간 내 AKI 발생 예측</span>
-                        <span id="akiRiskScore" style="font-size: 1.5rem; font-weight: 700; color: #f44336;">72%</span>
+                        <span id="akiRiskScore2" style="font-size: 1.5rem; font-weight: 700; color: #f44336;">72%</span>
                     </div>
                     <div style="background: linear-gradient(to right, #4caf50 0%, #ffeb3b 50%, #f44336 100%); height: 8px; border-radius: 4px; position: relative;">
-                        <div id="akiRiskIndicator" style="position: absolute; left: 72%; top: -4px; width: 16px; height: 16px; background: #f44336; border-radius: 50%; border: 2px solid white;"></div>
+                        <div id="akiRiskIndicator2" style="position: absolute; left: 72%; top: -4px; width: 16px; height: 16px; background: #f44336; border-radius: 50%; border: 2px solid white;"></div>
                     </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                     <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
                         <div style="font-size: 0.85rem; color: #666;">Cr 변화율</div>
-                        <div id="crChange" style="font-size: 1.25rem; font-weight: 600; color: #f44336;">↑ 45%</div>
+                        <div id="crChange2" style="font-size: 1.25rem; font-weight: 600; color: #f44336;">↑ 45%</div>
                     </div>
                     <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
                         <div style="font-size: 0.85rem; color: #666;">요량 (ml/hr)</div>
-                        <div id="urineOutput" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">28</div>
+                        <div id="urineOutput2" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">28</div>
                     </div>
                 </div>
-                <div id="akiRiskFactors" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                <div id="akiRiskFactors2" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px;">
                     <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
                         <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
                     </div>
@@ -562,10 +576,10 @@
                     </ul>
                 </div>
                 <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                    <button class="btn btn-primary" style="flex: 1; font-size: 0.9rem;">
+                    <button class="btn btn-primary" id="akiChecklistBtn" style="flex: 1; font-size: 0.9rem;">
                         <i class="fas fa-clipboard-check"></i> 예방 프로토콜
                     </button>
-                    <button class="btn btn-secondary" style="flex: 1; font-size: 0.9rem;">
+                    <button class="btn btn-secondary" id="akiHistoryBtn" style="flex: 1; font-size: 0.9rem;">
                         <i class="fas fa-chart-bar"></i> 상세 분석
                     </button>
                 </div>
@@ -1097,7 +1111,7 @@
         };
         
         // CLABSI 환자 선택 이벤트
-        document.getElementById('clabsiPatientSelect').addEventListener('change', function(e) {
+        document.getElementById('crbsiPatientSelect').addEventListener('change', function(e) {
             const selectedBed = e.target.value;
             updateCLABSICard(selectedBed);
         });
@@ -1107,7 +1121,7 @@
             const patient = patientCLABSIData[bedId];
             
             // 환자 정보 업데이트
-            document.getElementById('clabsiPatientInfo').innerHTML = `
+            document.getElementById('crbsiPatientInfo').innerHTML = `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                     <span><strong>${patient.name.split(' ')[0]}</strong> ${patient.name.split(' ')[1]}</span>
                     <span>중심정맥관: ${patient.catheterDays}일째</span>
@@ -1117,13 +1131,13 @@
             `;
             
             // 위험도 업데이트
-            document.getElementById('clabsiRiskScore').textContent = patient.riskScore + '%';
+            document.getElementById('crbsiRiskScore').textContent = patient.riskScore + '%';
             const color = patient.riskScore > 60 ? '#f44336' : patient.riskScore > 40 ? '#ff9800' : '#4caf50';
-            document.getElementById('clabsiRiskScore').style.color = color;
+            document.getElementById('crbsiRiskScore').style.color = color;
             
             // 프로그레스 바 업데이트
-            document.getElementById('clabsiRiskIndicator').style.left = patient.riskScore + '%';
-            document.getElementById('clabsiRiskIndicator').style.background = color;
+            document.getElementById('crbsiRiskIndicator').style.left = patient.riskScore + '%';
+            document.getElementById('crbsiRiskIndicator').style.background = color;
             
             // 지표 업데이트
             document.getElementById('wbcChange').textContent = patient.wbc + 'K';
@@ -1138,7 +1152,7 @@
             const cultureColor = patient.siteStatus.culture === '음성' ? '#4caf50' : patient.siteStatus.culture === '양성' ? '#f44336' : '#ff9800';
             const dressingColor = patient.siteStatus.dressingHours > 72 ? '#f44336' : patient.siteStatus.dressingHours > 48 ? '#ff9800' : '#4caf50';
             
-            document.getElementById('clabsiMonitoring').innerHTML = `
+            document.getElementById('crbsiMonitoring').innerHTML = `
                 <div style="font-weight: 500; margin-bottom: 0.5rem; color: #c2185b;">
                     <i class="fas fa-stethoscope"></i> 감염 징후 모니터링
                 </div>
@@ -1152,9 +1166,9 @@
             
             // 위험 요인 업데이트
             const riskFactorsList = patient.riskFactors.map(factor => `<li>${factor}</li>`).join('');
-            document.getElementById('clabsiRiskFactors').innerHTML = `
+            document.getElementById('crbsiRiskFactors').innerHTML = `
                 <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
-                    <i class="fas fa-exclamation-circle"></i> CLABSI 위험 요인
+                    <i class="fas fa-exclamation-circle"></i> CRBSI 위험 요인
                 </div>
                 <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
                     ${riskFactorsList}
@@ -1164,7 +1178,7 @@
         
         // CLABSI 위험도 실시간 업데이트
         function updateCLABSIRisk() {
-            const selectedBed = document.getElementById('clabsiPatientSelect').value;
+            const selectedBed = document.getElementById('crbsiPatientSelect').value;
             const patient = patientCLABSIData[selectedBed];
             
             // 환자별 위험도 변동 시뮬레이션
@@ -1173,15 +1187,15 @@
             newRiskScore = Math.max(10, Math.min(95, newRiskScore)); // 10-95% 범위 제한
             
             // 위험도 표시 업데이트
-            document.getElementById('clabsiRiskScore').textContent = Math.round(newRiskScore) + '%';
+            document.getElementById('crbsiRiskScore').textContent = Math.round(newRiskScore) + '%';
             
             // 위험도 색상 변경
             const color = newRiskScore > 60 ? '#f44336' : newRiskScore > 40 ? '#ff9800' : '#4caf50';
-            document.getElementById('clabsiRiskScore').style.color = color;
+            document.getElementById('crbsiRiskScore').style.color = color;
             
             // 프로그레스 바 업데이트
-            document.getElementById('clabsiRiskIndicator').style.left = newRiskScore + '%';
-            document.getElementById('clabsiRiskIndicator').style.background = color;
+            document.getElementById('crbsiRiskIndicator').style.left = newRiskScore + '%';
+            document.getElementById('crbsiRiskIndicator').style.background = color;
             
             // WBC와 체온도 약간 변동
             const wbcVariation = Math.random() * 1 - 0.5;
@@ -1197,7 +1211,7 @@
         setInterval(updateCLABSIRisk, 30000);
         
         // CLABSI 번들 체크리스트 버튼
-        document.getElementById('clabsiChecklistBtn').addEventListener('click', function() {
+        document.getElementById('crbsiChecklistBtn').addEventListener('click', function() {
             alert('CLABSI 예방 번들 체크리스트:\n\n' +
                   '✓ 손위생 수행\n' +
                   '✓ 최대 멸균 차단법 준수\n' +
@@ -1211,8 +1225,8 @@
         });
         
         // CLABSI 관리 이력 버튼
-        document.getElementById('clabsiHistoryBtn').addEventListener('click', function() {
-            const selectedBed = document.getElementById('clabsiPatientSelect').value;
+        document.getElementById('crbsiHistoryBtn').addEventListener('click', function() {
+            const selectedBed = document.getElementById('crbsiPatientSelect').value;
             const patient = patientCLABSIData[selectedBed];
             alert(`${patient.name} 중심정맥관 관리 이력:\n\n` +
                   `삽입일: ${patient.catheterDays}일 전\n` +
@@ -1282,6 +1296,12 @@
             updateAKICard(selectedBed);
         });
         
+        // 두 번째 AKI 환자 선택 이벤트
+        document.getElementById('akiPatientSelect2').addEventListener('change', function(e) {
+            const selectedBed = e.target.value;
+            updateAKICard2(selectedBed);
+        });
+        
         // AKI 카드 업데이트 함수
         function updateAKICard(bedId) {
             const patient = patientAKIData[bedId];
@@ -1315,6 +1335,48 @@
             // 위험 요인 업데이트
             const riskFactorsList = patient.riskFactors.map(factor => `<li>${factor}</li>`).join('');
             document.getElementById('akiRiskFactors').innerHTML = `
+                <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                    <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
+                </div>
+                <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                    ${riskFactorsList}
+                </ul>
+            `;
+        }
+        
+        // 두 번째 AKI 카드 업데이트 함수
+        function updateAKICard2(bedId) {
+            const patient = patientAKIData[bedId];
+            
+            // 환자 정보 업데이트
+            document.getElementById('akiPatientInfo2').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <span><strong>${patient.name.split(' ')[0]}</strong> ${patient.name.split(' ')[1]}</span>
+                    <span>ISS: ${patient.iss}점</span>
+                    <span>입원: ${patient.admissionHours}시간 경과</span>
+                    <span>진단: ${patient.diagnosis}</span>
+                </div>
+            `;
+            
+            // 위험도 업데이트
+            document.getElementById('akiRiskScore2').textContent = patient.riskScore + '%';
+            const color = patient.riskScore > 70 ? '#f44336' : patient.riskScore > 40 ? '#ff9800' : '#4caf50';
+            document.getElementById('akiRiskScore2').style.color = color;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('akiRiskIndicator2').style.left = patient.riskScore + '%';
+            document.getElementById('akiRiskIndicator2').style.background = color;
+            
+            // 지표 업데이트
+            document.getElementById('crChange2').textContent = patient.crChange;
+            document.getElementById('crChange2').style.color = patient.crChangeValue > 30 ? '#f44336' : '#ff9800';
+            
+            document.getElementById('urineOutput2').textContent = patient.urineOutput;
+            document.getElementById('urineOutput2').style.color = patient.urineOutput < 30 ? '#f44336' : patient.urineOutput < 50 ? '#ff9800' : '#4caf50';
+            
+            // 위험 요인 업데이트
+            const riskFactorsList = patient.riskFactors.map(factor => `<li>${factor}</li>`).join('');
+            document.getElementById('akiRiskFactors2').innerHTML = `
                 <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
                     <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
                 </div>
@@ -1360,19 +1422,19 @@
         setInterval(updateAKIRisk, 30000);
         
         // 예방 프로토콜 버튼 클릭 이벤트
-        const preventionBtn = document.querySelector('.fa-clipboard-check').parentElement;
-        if (preventionBtn) {
-            preventionBtn.addEventListener('click', function() {
+        const preventionBtns = document.querySelectorAll('.fa-clipboard-check');
+        preventionBtns.forEach((btn) => {
+            btn.parentElement.addEventListener('click', function() {
                 alert('AKI 예방 프로토콜:\n1. 수액 균형 최적화 (CVP 8-12)\n2. 신독성 약물 회피\n3. MAP > 65 유지\n4. 조영제 최소화\n5. 2시간마다 Cr/요량 모니터링');
             });
-        }
+        });
         
-        const analysisBtn = document.querySelector('.fa-chart-bar').parentElement;
-        if (analysisBtn) {
-            analysisBtn.addEventListener('click', function() {
+        const analysisBtns = document.querySelectorAll('.fa-chart-bar');
+        analysisBtns.forEach((btn) => {
+            btn.parentElement.addEventListener('click', function() {
                 alert('상세 분석 페이지로 이동합니다.\n- RIFLE/AKIN/KDIGO criteria 분석\n- 시간대별 위험도 추이\n- 예측 모델 상세 설명');
             });
-        }
+        });
 
         // 환자 선택 변경 이벤트
         document.getElementById('patientSelect').addEventListener('change', function(e) {
@@ -1383,8 +1445,10 @@
             
             // AKI와 CLABSI 선택도 동기화
             document.getElementById('akiPatientSelect').value = selectedPatient;
-            document.getElementById('clabsiPatientSelect').value = selectedPatient;
+            document.getElementById('akiPatientSelect2').value = selectedPatient;
+            document.getElementById('crbsiPatientSelect').value = selectedPatient;
             updateAKICard(selectedPatient);
+            updateAKICard2(selectedPatient);
             updateCLABSICard(selectedPatient);
         });
         
@@ -1394,18 +1458,22 @@
             updateAKICard(selectedBed);
             // 다른 카드도 동기화
             document.getElementById('patientSelect').value = selectedBed;
-            document.getElementById('clabsiPatientSelect').value = selectedBed;
+            document.getElementById('akiPatientSelect2').value = selectedBed;
+            document.getElementById('crbsiPatientSelect').value = selectedBed;
+            updateAKICard2(selectedBed);
             updateCLABSICard(selectedBed);
         });
         
         // CLABSI 환자 선택 이벤트
-        document.getElementById('clabsiPatientSelect').addEventListener('change', function(e) {
+        document.getElementById('crbsiPatientSelect').addEventListener('change', function(e) {
             const selectedBed = e.target.value;
             updateCLABSICard(selectedBed);
             // 다른 카드도 동기화
             document.getElementById('patientSelect').value = selectedBed;
             document.getElementById('akiPatientSelect').value = selectedBed;
+            document.getElementById('akiPatientSelect2').value = selectedBed;
             updateAKICard(selectedBed);
+            updateAKICard2(selectedBed);
         });
         
         // 클릭 이벤트 예시
@@ -1422,6 +1490,7 @@
         
         // 초기 AKI와 CLABSI 카드 설정
         updateAKICard('bed1');
+        updateAKICard2('bed1');
         updateCLABSICard('bed1');
         
         }); // DOMContentLoaded 종료

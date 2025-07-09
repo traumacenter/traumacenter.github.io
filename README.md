@@ -3,637 +3,847 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temporal Topic Analysis - Trauma Nursing Research</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <title>CRRT 간호 AI 시스템</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Times New Roman', serif;
-            margin: 20px;
-            background-color: #f8f9fa;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            font-size: 32px;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 15px;
-        }
-        h2 {
-            color: #34495e;
-            border-left: 4px solid #3498db;
-            padding-left: 15px;
-            margin-top: 40px;
-            font-size: 24px;
-        }
-        .analysis-summary {
+        
+        /* 헤더 스타일 */
+        .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .summary-grid {
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* 그리드 레이아웃 */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
-        .summary-item {
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
-            border-radius: 10px;
+        
+        /* 카드 기본 스타일 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .summary-value {
-            font-size: 2em;
-            font-weight: bold;
-            display: block;
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
-        .summary-label {
-            font-size: 0.9em;
-            opacity: 0.9;
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
-        .chart-container {
-            margin: 30px 0;
-            padding: 25px;
-            border: 2px solid #ecf0f1;
-            border-radius: 10px;
-            background-color: #fdfdfd;
-        }
-        .chart-title {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 25px;
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 500;
             color: #2c3e50;
-            font-size: 18px;
         }
-        .trend-analysis {
+        
+        /* 위험도 표시 스타일 */
+        .risk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .risk-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .risk-medium {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .risk-low {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        /* 환자 리스크 카드 */
+        .patient-card {
+            border-left: 4px solid;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .patient-card.high-risk {
+            border-left-color: #f44336;
+        }
+        
+        .patient-card.medium-risk {
+            border-left-color: #ff9800;
+        }
+        
+        .patient-card.low-risk {
+            border-left-color: #4caf50;
+        }
+        
+        .patient-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .patient-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .metrics {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
         }
-        .trend-card {
-            border: 1px solid #ddd;
+        
+        .metric {
+            text-align: center;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
             border-radius: 8px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
-        .trend-title {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 16px;
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
         }
-        .trend-stats {
-            font-size: 14px;
-            color: #34495e;
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
         }
-        .trend-up {
-            color: #27ae60;
-            font-weight: bold;
+        
+        /* 실시간 모니터링 차트 */
+        .chart-container {
+            height: 300px;
+            position: relative;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #fafafa;
+            border-radius: 8px;
         }
-        .trend-down {
-            color: #e74c3c;
-            font-weight: bold;
+        
+        .chart-placeholder {
+            height: 100%;
+            background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
         }
-        .trend-stable {
-            color: #f39c12;
-            font-weight: bold;
+        
+        /* 우선순위 리스트 */
+        .priority-list {
+            list-style: none;
         }
-        .insights-box {
-            background-color: #ecf0f1;
-            border-left: 5px solid #3498db;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
+        
+        .priority-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .insights-title {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
+        
+        .priority-item:hover {
+            background-color: #f8f9fa;
         }
-        .heatmap-container {
-            overflow-x: auto;
-            margin: 20px 0;
+        
+        .priority-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
         }
-        .heatmap-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
+        
+        .priority-high .priority-icon {
+            background-color: #ffebee;
+            color: #f44336;
         }
-        .heatmap-table th, .heatmap-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
+        
+        .priority-medium .priority-icon {
+            background-color: #fff3e0;
+            color: #ff9800;
         }
-        .heatmap-table th {
-            background-color: #34495e;
+        
+        .priority-low .priority-icon {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .priority-content {
+            flex: 1;
+        }
+        
+        .priority-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .priority-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .priority-time {
+            font-size: 0.85rem;
+            color: #999;
+        }
+        
+        /* 알림 패널 */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid;
+        }
+        
+        .alert-critical {
+            border-left-color: #f44336;
+            background-color: #ffebee;
+        }
+        
+        .alert-warning {
+            border-left-color: #ff9800;
+            background-color: #fff3e0;
+        }
+        
+        .alert-info {
+            border-left-color: #2196f3;
+            background-color: #e3f2fd;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* 액션 버튼 */
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: #667eea;
             color: white;
-            font-weight: bold;
         }
-        .heat-very-high { background-color: #8B0000; color: white; }
-        .heat-high { background-color: #DC143C; color: white; }
-        .heat-medium { background-color: #FF6347; color: white; }
-        .heat-low { background-color: #FFB6C1; color: black; }
-        .heat-very-low { background-color: #F0F8FF; color: black; }
-        .controls {
-            text-align: center;
-            margin: 20px 0;
+        
+        .btn-primary:hover {
+            background-color: #5a67d8;
         }
-        .control-button {
-            background: #3498db;
+        
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+        
+        /* 빠른 액션 플로팅 버튼 */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #667eea;
             color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 5px;
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
         }
-        .control-button:hover {
-            background: #2980b9;
+        
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
-        .control-button.active {
-            background: #e74c3c;
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <div>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 0.25rem;">CRRT 간호 AI 시스템</h1>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">실시간 환자 모니터링 대시보드</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <span><i class="fas fa-clock"></i> 2024.03.15 14:30</span>
+                <span><i class="fas fa-user"></i> 김간호 (TICU-A)</span>
+                <button class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white;">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
     <div class="container">
-        <h1>Temporal Analysis of Topics in Trauma Nursing Research</h1>
-        
-        <!-- 분석 요약 -->
-        <div class="analysis-summary">
-            <h3>Analysis Overview</h3>
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-value">10</span>
-                    <span class="summary-label">Years Analyzed</span>
+        <!-- 요약 정보 -->
+        <div class="dashboard-grid">
+            <!-- 전체 환자 현황 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">TICU 환자 현황</h2>
+                    <button class="btn btn-primary">상세보기</button>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-value">2015-2024</span>
-                    <span class="summary-label">Year Range</span>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">총 환자수</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" style="color: #f44336;">3</div>
+                        <div class="metric-label">고위험군</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" style="color: #ff9800;">5</div>
+                        <div class="metric-label">중간위험군</div>
+                    </div>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-value">423</span>
-                    <span class="summary-label">Total Documents</span>
+            </div>
+
+            <!-- AI 예측 요약 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">AI 예측 알림</h2>
+                    <span class="risk-indicator risk-high">
+                        <i class="fas fa-exclamation-triangle"></i> 즉시 확인 필요
+                    </span>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-value">10</span>
-                    <span class="summary-label">Topics Identified</span>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-bacteria" style="color: #f44336;"></i>
+                        <span>CAUTI 고위험: 301호 박OO (87% 확률)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-tint" style="color: #ff9800;"></i>
+                        <span>CLABSI 주의: 305호 이OO (65% 확률)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-chart-line" style="color: #2196f3;"></i>
+                        <span>상태 악화 예측: 308호 김OO (24시간 내)</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 연도별 토픽 분포 추세 -->
-        <h2>1. Topic Distribution Trends Over Time</h2>
-        <div class="chart-container">
-            <div class="chart-title">Topic Proportions by Year (Line Chart)</div>
-            <canvas id="topicTrendsChart" width="1200" height="600"></canvas>
-        </div>
+        <!-- 환자별 상세 정보 -->
+        <h2 style="margin: 2rem 0 1rem; font-size: 1.5rem; color: #2c3e50;">고위험 환자 모니터링</h2>
+        <div class="dashboard-grid">
+            <!-- 환자 1 -->
+            <div class="card patient-card high-risk">
+                <div class="patient-info">
+                    <div>
+                        <div class="patient-name">301호 박OO (65세/남)</div>
+                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">CRRT 3일차</div>
+                    </div>
+                    <span class="risk-indicator risk-high">
+                        <i class="fas fa-exclamation-circle"></i> 고위험
+                    </span>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" style="color: #f44336;">87%</div>
+                        <div class="metric-label">감염 위험도</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">4.5</div>
+                        <div class="metric-label">간호 집중도</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2h</div>
+                        <div class="metric-label">다음 모니터링</div>
+                    </div>
+                </div>
+                <div style="background-color: #ffebee; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="color: #c62828;">⚠️ 주의사항:</strong>
+                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: 0.9rem;">
+                        <li>도뇨관 삽입 부위 발적 관찰됨</li>
+                        <li>체온 38.2°C로 상승 추세</li>
+                        <li>WBC 15,000으로 증가</li>
+                    </ul>
+                </div>
+            </div>
 
-        <!-- 연도별 문서 수 -->
-        <h2>2. Publication Volume Over Time</h2>
-        <div class="chart-container">
-            <div class="chart-title">Number of Documents by Year</div>
-            <canvas id="documentVolumeChart" width="1200" height="400"></canvas>
-        </div>
-
-        <!-- 토픽별 변화율 분석 -->
-        <h2>3. Topic Change Rate Analysis</h2>
-        <div class="trend-analysis" id="trendAnalysis">
-            <!-- 동적으로 생성됨 -->
-        </div>
-
-        <!-- 히트맵 -->
-        <h2>4. Topic-Year Heatmap</h2>
-        <div class="chart-container">
-            <div class="chart-title">Topic Intensity by Year</div>
-            <div class="heatmap-container" id="heatmapContainer">
-                <!-- 동적으로 생성됨 -->
+            <!-- 환자 2 -->
+            <div class="card patient-card medium-risk">
+                <div class="patient-info">
+                    <div>
+                        <div class="patient-name">305호 이OO (72세/여)</div>
+                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">CRRT 5일차</div>
+                    </div>
+                    <span class="risk-indicator risk-medium">
+                        <i class="fas fa-exclamation"></i> 중간위험
+                    </span>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" style="color: #ff9800;">65%</div>
+                        <div class="metric-label">감염 위험도</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">3.2</div>
+                        <div class="metric-label">간호 집중도</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">4h</div>
+                        <div class="metric-label">다음 모니터링</div>
+                    </div>
+                </div>
+                <div style="background-color: #fff3e0; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="color: #ef6c00;">📋 모니터링 포인트:</strong>
+                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: 0.9rem;">
+                        <li>중심정맥관 드레싱 교체 필요</li>
+                        <li>필터 응고 징후 관찰</li>
+                        <li>전해질 불균형 모니터링</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <!-- 상관관계 분석 -->
-        <h2>5. Topic Correlation Matrix</h2>
-        <div class="chart-container">
-            <div class="chart-title">Correlation Between Topics Over Time</div>
-            <canvas id="correlationChart" width="800" height="800"></canvas>
-        </div>
-
-        <!-- 인사이트 -->
-        <div class="insights-box">
-            <div class="insights-title">Key Insights:</div>
-            <div id="insights">
-                <!-- 동적으로 생성됨 -->
+        <!-- 실시간 모니터링 차트 -->
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <h2 class="card-title">실시간 생체 신호 모니터링</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <select class="btn btn-secondary" id="patientSelect">
+                        <option value="301">301호 박OO (고위험)</option>
+                        <option value="305">305호 이OO (중간위험)</option>
+                        <option value="308">308호 김OO (저위험)</option>
+                    </select>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i> 데이터 내보내기
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="vitalSignsChart"></canvas>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+                <div class="metric">
+                    <div class="metric-value" id="currentBP">120/80</div>
+                    <div class="metric-label">혈압 (mmHg)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="currentHR">75</div>
+                    <div class="metric-label">맥박 (bpm)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="currentRR">16</div>
+                    <div class="metric-label">호흡수 (/min)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="currentTemp">36.8</div>
+                    <div class="metric-label">체온 (°C)</div>
+                </div>
             </div>
         </div>
 
-        <!-- 상세 주제 정보 -->
-        <h2>6. Topic Details and Evolution</h2>
-        <div class="chart-container">
-            <div class="controls">
-                <button class="control-button active" onclick="showAllTopics()">All Topics</button>
-                <button class="control-button" onclick="showTopTrending()">Top Trending</button>
-                <button class="control-button" onclick="showMostStable()">Most Stable</button>
+        <!-- 간호 업무 우선순위 -->
+        <div class="dashboard-grid" style="margin-top: 2rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">간호 업무 우선순위</h2>
+                    <span style="font-size: 0.9rem; color: #666;">14:30 기준</span>
+                </div>
+                <ul class="priority-list">
+                    <li class="priority-item priority-high">
+                        <div class="priority-icon">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div class="priority-content">
+                            <div class="priority-title">301호 도뇨관 교체</div>
+                            <div class="priority-desc">감염 위험 증가로 즉시 교체 필요</div>
+                        </div>
+                        <div class="priority-time">즉시</div>
+                    </li>
+                    <li class="priority-item priority-medium">
+                        <div class="priority-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="priority-content">
+                            <div class="priority-title">305호 필터 점검</div>
+                            <div class="priority-desc">응고 징후 확인 필요</div>
+                        </div>
+                        <div class="priority-time">30분 내</div>
+                    </li>
+                    <li class="priority-item priority-low">
+                        <div class="priority-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="priority-content">
+                            <div class="priority-title">308호 정기 모니터링</div>
+                            <div class="priority-desc">활력징후 및 I/O 확인</div>
+                        </div>
+                        <div class="priority-time">1시간 내</div>
+                    </li>
+                </ul>
             </div>
-            <canvas id="detailedTrendsChart" width="1200" height="500"></canvas>
+
+            <!-- 실시간 알림 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">실시간 알림</h2>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-bell"></i> 알림 설정
+                    </button>
+                </div>
+                <div>
+                    <div class="alert-item alert-critical">
+                        <div class="alert-icon" style="color: #f44336;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">301호 CRRT 알람 발생</div>
+                            <div class="alert-time">2분 전</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-warning">
+                        <div class="alert-icon" style="color: #ff9800;">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">305호 체온 상승 (37.8°C)</div>
+                            <div class="alert-time">15분 전</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-info">
+                        <div class="alert-icon" style="color: #2196f3;">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">AI 예측 모델 업데이트 완료</div>
+                            <div class="alert-time">30분 전</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- 빠른 액션 플로팅 버튼 -->
+    <button class="fab">
+        <i class="fas fa-plus"></i>
+    </button>
+
     <script>
-        // 데이터 설정
-        const yearlyData = {"years": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "topics": [{"values": [15.34279740318813, 11.815023733006754, 5.099622700260141, 11.757363342549302, 11.7096062007263, 11.710442969266968, 11.210636403834165, 8.769304710691951, 9.459589450377571, 8.35766873312337]}, {"values": [5.250336532662052, 9.001173841485638, 9.660357799509258, 7.8381167083627385, 10.337682422297023, 9.477407785371177, 12.091985857847718, 14.812367331637422, 11.569021167651119, 10.645176277640752]}, {"values": [15.84391670859159, 4.417940381941795, 11.606089856879231, 10.771598812751753, 13.118141917116446, 16.33733144566577, 15.39218457416777, 14.905129524266941, 8.400592576229664, 9.205804695354843]}, {"values": [4.840187895250541, 11.077022458811829, 5.628622782259396, 8.870964107511739, 9.724122102689307, 9.126006903218551, 11.988507689117588, 9.41522423883003, 10.140918123705314, 8.208811717064787]}, {"values": [6.0477934692856605, 8.660312442086123, 7.182326678380317, 8.122636869118171, 4.818367740440251, 7.685858636199668, 1.7632634852733753, 6.56489323961663, 3.1546213717013263, 4.181727033947381]}, {"values": [4.974728938761797, 7.390885572341841, 9.35020835398445, 7.3148687732842905, 7.404851757039807, 5.645875592109072, 8.839305771264529, 3.1248237848016767, 12.158488927145914, 9.999697173917742]}, {"values": [13.408361092089946, 11.16945153795648, 18.264386956843598, 13.21355912853091, 15.039405495269914, 11.42335690868556, 11.804754128938718, 15.979484964890577, 16.299318003823206, 16.070159286357804]}, {"values": [7.409390969430945, 6.10126124542953, 8.270568693874452, 11.405699258127118, 6.285963942582851, 9.421272896213486, 8.27110818710986, 8.355242437135345, 10.521670638717733, 10.455575946101572]}, {"values": [17.794178217537947, 22.882431036133468, 18.23572301528636, 16.1016708386662, 16.72792101079829, 10.496493856101218, 11.088568447976682, 15.189257922809855, 15.104390316928177, 15.450000791405449]}, {"values": [9.08830877320139, 7.484497750806543, 6.7020931627228, 4.603522161097774, 4.833937411039808, 8.67595300716853, 7.5496854544695955, 2.8842718453195766, 3.1913894237199676, 7.425378345086305]}]};
-        const topicNames = ["improvement + performance + time", "stress + disorder + burnout", "mortality + iss + admission", "pediatric + child + prevention", "pain + violence + safety", "blood + transfusion + time", "level + from + center", "screen + discharge + intervention", "education + training + team", "fracture + vehicle + txa"];
-        const yearlyStats = {"document_counts": [34, 39, 42, 47, 40, 48, 45, 43, 44, 41]};
-        const correlationData = [[1.0, -0.5566798002081472, 0.23969260453959523, 0.06535779887788842, 0.06280431268417236, -0.41045475070395876, -0.7421511553855706, -0.2556803800633391, 0.0006508524039378462, 0.355780645042817], [-0.5566798002081472, 1.0, 0.04307141803290648, 0.5633496878539218, -0.396751248227261, 0.05612609863105039, 0.3102931608111016, 0.07975303798336118, -0.3576598544366106, -0.5985118854330863], [0.23969260453959523, 0.04307141803290648, 1.0, -0.2512553132577901, -0.18281173717967666, -0.5409499056344873, -0.08678082656952954, -0.030448799208388753, -0.6800227124242101, 0.19050389834980755], [0.06535779887788842, 0.5633496878539218, -0.2512553132577901, 1.0, -0.30740727658293177, 0.17900611403057107, -0.4503281587569955, -0.038240448843678165, -0.23465958945738513, -0.29821434322265716], [0.06280431268417236, -0.396751248227261, -0.18281173717967666, -0.30740727658293177, 1.0, -0.509020892767659, -0.18529544120987063, -0.12299112737907512, 0.4820768256853226, 0.11844145848625726], [-0.41045475070395876, 0.05612609863105039, -0.5409499056344873, 0.17900611403057107, -0.509020892767659, 1.0, 0.32389485695461023, 0.35416046404923807, 0.006052546446221611, -0.10245024205717637], [-0.7421511553855706, 0.3102931608111016, -0.08678082656952954, -0.4503281587569955, -0.18529544120987063, 0.32389485695461023, 1.0, 0.20546876033295697, 0.1313020113616996, -0.4939204526486581], [-0.2556803800633391, 0.07975303798336118, -0.030448799208388753, -0.038240448843678165, -0.12299112737907512, 0.35416046404923807, 0.20546876033295697, 1.0, -0.47144834659875606, -0.25905832870942064], [0.0006508524039378462, -0.3576598544366106, -0.6800227124242101, -0.23465958945738513, 0.4820768256853226, 0.006052546446221611, 0.1313020113616996, -0.47144834659875606, 1.0, -0.021559186359233887], [0.355780645042817, -0.5985118854330863, 0.19050389834980755, -0.29821434322265716, 0.11844145848625726, -0.10245024205717637, -0.4939204526486581, -0.25905832870942064, -0.021559186359233887, 1.0]];
-        const trendAnalysis = [{"change_rate": -0.03607906966742481, "peak_year": 2015, "avg_proportion": 10.523205564702465}, {"change_rate": 0.06271662842495568, "peak_year": 2022, "avg_proportion": 10.06836257244649}, {"change_rate": 0.0008645053026752979, "peak_year": 2020, "avg_proportion": 11.99987304929658}, {"change_rate": 0.03502936528401299, "peak_year": 2021, "avg_proportion": 8.902038801845908}, {"change_rate": -0.07774193119137443, "peak_year": 2016, "avg_proportion": 5.81818009660489}, {"change_rate": 0.03999275046877146, "peak_year": 2023, "avg_proportion": 7.620373464465112}, {"change_rate": 0.017245832730671415, "peak_year": 2017, "avg_proportion": 14.267223750338673}, {"change_rate": 0.03679439371729778, "peak_year": 2018, "avg_proportion": 8.649775421472288}, {"change_rate": -0.042689989371888636, "peak_year": 2016, "avg_proportion": 15.907063545364366}, {"change_rate": -0.04991703660683065, "peak_year": 2015, "avg_proportion": 6.243903733463229}];
-
-        // 색상 팔레트
-        const colors = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
-        ];
-
-        // 1. 토픽 추세 차트
-        const ctx1 = document.getElementById('topicTrendsChart').getContext('2d');
-        const trendsChart = new Chart(ctx1, {
+        // 실시간 시간 업데이트
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.querySelector('.fa-clock').nextSibling.textContent = ' ' + timeString;
+        }
+        
+        // 1분마다 시간 업데이트
+        setInterval(updateTime, 60000);
+        
+        // 바이탈 사인 차트 설정
+        const ctx = document.getElementById('vitalSignsChart').getContext('2d');
+        const vitalSignsChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: yearlyData.years,
-                datasets: yearlyData.topics.map((topic, index) => ({
-                    label: `Topic ${index + 1}: ${topicNames[index]}`,
-                    data: topic.values,
-                    borderColor: colors[index % colors.length],
-                    backgroundColor: colors[index % colors.length] + '20',
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }))
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Topic Proportion (%)',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            font: {
-                                size: 10
-                            },
-                            boxWidth: 12
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) {
-                                return 'Year: ' + context[0].label;
-                            },
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // 2. 문서 볼륨 차트
-        const ctx2 = document.getElementById('documentVolumeChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: yearlyData.years,
+                labels: [],
                 datasets: [{
-                    label: 'Number of Documents',
-                    data: yearlyStats.document_counts,
-                    backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 2
+                    label: '수축기 혈압',
+                    data: [],
+                    borderColor: '#f44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y-bp',
+                }, {
+                    label: '이완기 혈압',
+                    data: [],
+                    borderColor: '#ff9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y-bp',
+                }, {
+                    label: '맥박',
+                    data: [],
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y-hr',
+                }, {
+                    label: '호흡수',
+                    data: [],
+                    borderColor: '#2196f3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y-rr',
                 }]
             },
             options: {
                 responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Document Count',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        beginAtZero: true
-                    }
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
                 },
                 plugins: {
                     legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // 3. 추세 분석 카드 생성
-        function createTrendAnalysis() {
-            const container = document.getElementById('trendAnalysis');
-            
-            trendAnalysis.forEach((trend, index) => {
-                const card = document.createElement('div');
-                card.className = 'trend-card';
-                
-                let trendClass = 'trend-stable';
-                let trendText = 'Stable';
-                if (trend.change_rate > 0.1) {
-                    trendClass = 'trend-up';
-                    trendText = 'Increasing';
-                } else if (trend.change_rate < -0.1) {
-                    trendClass = 'trend-down';
-                    trendText = 'Decreasing';
-                }
-                
-                card.innerHTML = `
-                    <div class="trend-title">Topic ${index + 1}: ${topicNames[index]}</div>
-                    <div class="trend-stats">
-                        <div>Trend: <span class="${trendClass}">${trendText}</span></div>
-                        <div>Change Rate: <span class="${trendClass}">${(trend.change_rate * 100).toFixed(1)}%</span></div>
-                        <div>Peak Year: ${trend.peak_year}</div>
-                        <div>Avg Proportion: ${trend.avg_proportion.toFixed(1)}%</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // 4. 히트맵 생성
-        function createHeatmap() {
-            const container = document.getElementById('heatmapContainer');
-            
-            let html = '<table class="heatmap-table"><thead><tr><th>Topic</th>';
-            yearlyData.years.forEach(year => {
-                html += `<th>${year}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            yearlyData.topics.forEach((topic, topicIndex) => {
-                html += `<tr><td><strong>Topic ${topicIndex + 1}</strong></td>`;
-                topic.values.forEach(value => {
-                    let heatClass = 'heat-very-low';
-                    if (value > 20) heatClass = 'heat-very-high';
-                    else if (value > 15) heatClass = 'heat-high';
-                    else if (value > 10) heatClass = 'heat-medium';
-                    else if (value > 5) heatClass = 'heat-low';
-                    
-                    html += `<td class="${heatClass}">${value.toFixed(1)}%</td>`;
-                });
-                html += '</tr>';
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        // 5. 상관관계 매트릭스
-        const ctx5 = document.getElementById('correlationChart').getContext('2d');
-        new Chart(ctx5, {
-            type: 'scatter',
-            data: {
-                datasets: correlationData.map((corr, index) => ({
-                    label: `Topic ${index + 1} Correlations`,
-                    data: corr.map((value, i) => ({x: i, y: index, v: value})),
-                    backgroundColor: function(context) {
-                        const value = context.parsed.v;
-                        const alpha = Math.abs(value);
-                        return value > 0 ? `rgba(231, 76, 60, ${alpha})` : `rgba(52, 152, 219, ${alpha})`;
-                    },
-                    pointRadius: 15
-                }))
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'linear',
                         position: 'bottom',
-                        min: 0,
-                        max: 10 - 1,
-                        title: {
-                            display: true,
-                            text: 'Topic Index'
-                        }
                     },
-                    y: {
-                        type: 'linear',
-                        min: 0,
-                        max: 10 - 1,
-                        title: {
-                            display: true,
-                            text: 'Topic Index'
-                        }
+                    title: {
+                        display: true,
+                        text: '최근 2시간 바이탈 사인 추이'
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Correlation: ${context.parsed.v.toFixed(3)}`;
-                            }
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: '시간'
                         }
+                    },
+                    'y-bp': {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '혈압 (mmHg)'
+                        },
+                        min: 40,
+                        max: 180,
+                    },
+                    'y-hr': {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '맥박 (bpm)'
+                        },
+                        min: 40,
+                        max: 140,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    },
+                    'y-rr': {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '호흡수 (/min)'
+                        },
+                        min: 8,
+                        max: 30,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
                     }
                 }
             }
         });
-
-        // 6. 상세 추세 차트 (제어 가능)
-        let detailedChart;
         
-        function createDetailedChart(selectedTopics) {
-            if (detailedChart) {
-                detailedChart.destroy();
+        // 초기 데이터 생성 (최근 2시간)
+        const now = new Date();
+        for (let i = 24; i >= 0; i--) {
+            const time = new Date(now - i * 5 * 60 * 1000);
+            vitalSignsChart.data.labels.push(time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }));
+            
+            // 실제같은 바이탈 사인 데이터 생성
+            vitalSignsChart.data.datasets[0].data.push(115 + Math.random() * 15); // 수축기
+            vitalSignsChart.data.datasets[1].data.push(70 + Math.random() * 10);  // 이완기
+            vitalSignsChart.data.datasets[2].data.push(70 + Math.random() * 20);  // 맥박
+            vitalSignsChart.data.datasets[3].data.push(14 + Math.random() * 6);   // 호흡수
+        }
+        vitalSignsChart.update();
+        
+        // 5초마다 새로운 데이터 추가
+        setInterval(() => {
+            const time = new Date();
+            vitalSignsChart.data.labels.push(time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }));
+            vitalSignsChart.data.labels.shift();
+            
+            // 새로운 바이탈 사인 추가
+            const newSBP = 115 + Math.random() * 15;
+            const newDBP = 70 + Math.random() * 10;
+            const newHR = 70 + Math.random() * 20;
+            const newRR = 14 + Math.random() * 6;
+            const newTemp = 36.5 + Math.random() * 0.8;
+            
+            vitalSignsChart.data.datasets[0].data.push(newSBP);
+            vitalSignsChart.data.datasets[0].data.shift();
+            vitalSignsChart.data.datasets[1].data.push(newDBP);
+            vitalSignsChart.data.datasets[1].data.shift();
+            vitalSignsChart.data.datasets[2].data.push(newHR);
+            vitalSignsChart.data.datasets[2].data.shift();
+            vitalSignsChart.data.datasets[3].data.push(newRR);
+            vitalSignsChart.data.datasets[3].data.shift();
+            
+            // 현재 값 업데이트
+            document.getElementById('currentBP').textContent = `${Math.round(newSBP)}/${Math.round(newDBP)}`;
+            document.getElementById('currentHR').textContent = Math.round(newHR);
+            document.getElementById('currentRR').textContent = Math.round(newRR);
+            document.getElementById('currentTemp').textContent = newTemp.toFixed(1);
+            
+            // TICU 특화 알림 체크
+            if (newSBP < 90) {
+                document.getElementById('currentBP').style.color = '#f44336';
+            } else if (newSBP > 140) {
+                document.getElementById('currentBP').style.color = '#ff9800';
+            } else {
+                document.getElementById('currentBP').style.color = '#667eea';
             }
             
-            const ctx6 = document.getElementById('detailedTrendsChart').getContext('2d');
-            detailedChart = new Chart(ctx6, {
-                type: 'line',
-                data: {
-                    labels: yearlyData.years,
-                    datasets: selectedTopics.map(index => ({
-                        label: `Topic ${index + 1}: ${topicNames[index]}`,
-                        data: yearlyData.topics[index].values,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '30',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 5,
-                        pointHoverRadius: 8,
-                        borderWidth: 3
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Year',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Topic Proportion (%)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
-                    }
-                }
+            if (newHR > 100 || newHR < 60) {
+                document.getElementById('currentHR').style.color = '#f44336';
+            } else {
+                document.getElementById('currentHR').style.color = '#667eea';
+            }
+            
+            vitalSignsChart.update('none');
+        }, 5000);
+        
+        // 환자 선택 변경 이벤트
+        document.getElementById('patientSelect').addEventListener('change', function(e) {
+            const selectedPatient = e.target.value;
+            // 환자별로 다른 바이탈 범위 설정
+            console.log(`환자 ${selectedPatient}호로 전환`);
+            // 실제 구현시에는 환자별 데이터를 서버에서 가져와서 차트 업데이트
+        });
+        
+        // 클릭 이벤트 예시
+        document.querySelectorAll('.priority-item').forEach(item => {
+            item.addEventListener('click', function() {
+                alert('간호 업무 상세 페이지로 이동합니다.');
             });
-        }
-
-        // 컨트롤 함수들
-        function showAllTopics() {
-            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            createDetailedChart([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        }
-
-        function showTopTrending() {
-            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // 변화율이 높은 상위 5개 토픽
-            const topTrending = trendAnalysis
-                .map((trend, index) => ({index, change_rate: trend.change_rate}))
-                .sort((a, b) => Math.abs(b.change_rate) - Math.abs(a.change_rate))
-                .slice(0, 5)
-                .map(item => item.index);
-            
-            createDetailedChart(topTrending);
-        }
-
-        function showMostStable() {
-            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // 변화율이 낮은 상위 5개 토픽
-            const mostStable = trendAnalysis
-                .map((trend, index) => ({index, change_rate: Math.abs(trend.change_rate)}))
-                .sort((a, b) => a.change_rate - b.change_rate)
-                .slice(0, 5)
-                .map(item => item.index);
-            
-            createDetailedChart(mostStable);
-        }
-
-        // 인사이트 생성
-        function generateInsights() {
-            const insights = [];
-            
-            // 가장 급성장하는 토픽
-            const fastestGrowing = trendAnalysis.reduce((max, trend, index) => 
-                trend.change_rate > max.change_rate ? {...trend, index} : max
-            );
-            insights.push(`<strong>Fastest Growing Topic:</strong> Topic ${fastestGrowing.index + 1} (${topicNames[fastestGrowing.index]}) with ${(fastestGrowing.change_rate * 100).toFixed(1)}% growth rate.`);
-            
-            // 가장 감소하는 토픽
-            const fastestDeclining = trendAnalysis.reduce((min, trend, index) => 
-                trend.change_rate < min.change_rate ? {...trend, index} : min
-            );
-            insights.push(`<strong>Fastest Declining Topic:</strong> Topic ${fastestDeclining.index + 1} (${topicNames[fastestDeclining.index]}) with ${(fastestDeclining.change_rate * 100).toFixed(1)}% decline rate.`);
-            
-            // 가장 안정적인 토픽
-            const mostStable = trendAnalysis.reduce((min, trend, index) => 
-                Math.abs(trend.change_rate) < Math.abs(min.change_rate) ? {...trend, index} : min
-            );
-            insights.push(`<strong>Most Stable Topic:</strong> Topic ${mostStable.index + 1} (${topicNames[mostStable.index]}) with minimal change (${(mostStable.change_rate * 100).toFixed(1)}%).`);
-            
-            // 연구 활동이 가장 활발한 연도
-            const maxDocsIndex = yearlyStats.document_counts.indexOf(Math.max(...yearlyStats.document_counts));
-            const peakYear = yearlyData.years[maxDocsIndex];
-            insights.push(`<strong>Peak Research Year:</strong> ${peakYear} with ${yearlyStats.document_counts[maxDocsIndex]} documents published.`);
-            
-            document.getElementById('insights').innerHTML = insights.join('<br><br>');
-        }
-
-        // 초기화
-        createTrendAnalysis();
-        createHeatmap();
-        createDetailedChart([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        generateInsights();
+        });
+        
+        // 플로팅 버튼 클릭
+        document.querySelector('.fab').addEventListener('click', function() {
+            alert('새 환자 등록 또는 긴급 알림 생성');
+        });
     </script>
 </body>
 </html>

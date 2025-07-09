@@ -436,7 +436,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-tint" style="color: #ff9800;"></i>
-                        <span>CLABSI 주의: BED5 이OO (65% 확률)</span>
+                        <span>CRBSI 주의: BED5 이OO (65% 확률)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-chart-line" style="color: #2196f3;"></i>
@@ -502,6 +502,143 @@
                     </button>
                     <button class="btn btn-secondary" style="flex: 1; font-size: 0.9rem;">
                         <i class="fas fa-chart-bar"></i> 상세 분석
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 환자별 위험도 분석 -->
+        <h2 style="margin: 2rem 0 1rem; font-size: 1.5rem; color: #2c3e50;">환자별 위험도 분석</h2>
+        <div class="dashboard-grid">
+            <!-- AKI 위험도 분석 카드 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-kidneys" style="color: #9c27b0;"></i> AKI 위험도 분석
+                    </h2>
+                    <select class="btn btn-secondary" id="akiPatientSelect" style="font-size: 0.9rem;">
+                        <option value="bed1">BED1 박OO</option>
+                        <option value="bed5">BED5 이OO</option>
+                        <option value="bed8">BED8 김OO</option>
+                    </select>
+                </div>
+                <!-- 환자 정보 표시 -->
+                <div id="akiPatientInfo" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <span><strong>BED1</strong> 박OO (65세/남)</span>
+                        <span>ISS: 28점</span>
+                        <span>입원: 72시간 경과</span>
+                        <span>진단: 다발성 외상</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 500;">48시간 내 AKI 발생 예측</span>
+                        <span id="akiRiskScore" style="font-size: 1.5rem; font-weight: 700; color: #f44336;">72%</span>
+                    </div>
+                    <div style="background: linear-gradient(to right, #4caf50 0%, #ffeb3b 50%, #f44336 100%); height: 8px; border-radius: 4px; position: relative;">
+                        <div id="akiRiskIndicator" style="position: absolute; left: 72%; top: -4px; width: 16px; height: 16px; background: #f44336; border-radius: 50%; border: 2px solid white;"></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">Cr 변화율</div>
+                        <div id="crChange" style="font-size: 1.25rem; font-weight: 600; color: #f44336;">↑ 45%</div>
+                    </div>
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">요량 (ml/hr)</div>
+                        <div id="urineOutput" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">28</div>
+                    </div>
+                </div>
+                <div id="akiRiskFactors" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                    <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                        <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                        <li>대량수혈: pRBC 14 units (4hr)</li>
+                        <li>횡문근융해증: CK 8,500</li>
+                        <li>저혈압: MAP < 65 (2hr)</li>
+                        <li>조영제 사용: 복부 CT (3회)</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-clipboard-check"></i> 예방 프로토콜
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-chart-bar"></i> 상세 분석
+                    </button>
+                </div>
+            </div>
+
+            <!-- CRBSI 위험도 분석 카드 추가 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-tint" style="color: #e91e63;"></i> CRBSI 위험도 분석
+                    </h2>
+                    <select class="btn btn-secondary" id="crbsiPatientSelect" style="font-size: 0.9rem;">
+                        <option value="bed1">BED1 박OO</option>
+                        <option value="bed5">BED5 이OO</option>
+                        <option value="bed8">BED8 김OO</option>
+                    </select>
+                </div>
+                <!-- 환자 정보 표시 -->
+                <div id="crbsiPatientInfo" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <span><strong>BED1</strong> 박OO (65세/남)</span>
+                        <span>중심정맥관: 5일째</span>
+                        <span>삽입부위: 우측 내경정맥</span>
+                        <span>카테터: Triple lumen</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 500;">72시간 내 CRBSI 발생 예측</span>
+                        <span id="crbsiRiskScore" style="font-size: 1.5rem; font-weight: 700; color: #ff9800;">65%</span>
+                    </div>
+                    <div style="background: linear-gradient(to right, #4caf50 0%, #ffeb3b 50%, #f44336 100%); height: 8px; border-radius: 4px; position: relative;">
+                        <div id="crbsiRiskIndicator" style="position: absolute; left: 65%; top: -4px; width: 16px; height: 16px; background: #ff9800; border-radius: 50%; border: 2px solid white;"></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">WBC 변화</div>
+                        <div id="wbcChange" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">15.2K</div>
+                    </div>
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">체온 (°C)</div>
+                        <div id="tempValue" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">38.2</div>
+                    </div>
+                </div>
+                <div id="crbsiMonitoring" style="background-color: #fce4ec; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="font-weight: 500; margin-bottom: 0.5rem; color: #c2185b;">
+                        <i class="fas fa-stethoscope"></i> 감염 징후 모니터링
+                    </div>
+                    <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 0.75rem; font-size: 0.9rem;">
+                        <span style="color: #f44336;">●</span><span>삽입부위: 발적 (+), 압통 (+)</span>
+                        <span style="color: #ff9800;">●</span><span>분비물: 소량 장액성</span>
+                        <span style="color: #4caf50;">●</span><span>혈액배양: 진행 중</span>
+                        <span style="color: #ff9800;">●</span><span>드레싱 상태: 48시간 경과</span>
+                    </div>
+                </div>
+                <div id="crbsiRiskFactors" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                    <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                        <i class="fas fa-exclamation-circle"></i> CRBSI 위험 요인
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                        <li>중심정맥관 유지: 5일 이상</li>
+                        <li>면역억제: 스테로이드 사용 중</li>
+                        <li>다회 조작: CRRT 연결/분리</li>
+                        <li>TPN 투여 중</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" id="crbsiChecklistBtn" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-tasks"></i> 번들 체크리스트
+                    </button>
+                    <button class="btn btn-secondary" id="crbsiHistoryBtn" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-history"></i> 관리 이력
                     </button>
                 </div>
             </div>
@@ -889,6 +1026,204 @@
             vitalSignsChart.update('none');
         }, 5000);
         
+        // 환자별 CLABSI 데이터
+        const patientCLABSIData = {
+            bed1: {
+                name: 'BED1 박OO (65세/남)',
+                catheterDays: 5,
+                insertionSite: '우측 내경정맥',
+                catheterType: 'Triple lumen',
+                riskScore: 65,
+                wbc: 15.2,
+                temperature: 38.2,
+                siteStatus: {
+                    redness: true,
+                    tenderness: true,
+                    discharge: '소량 장액성',
+                    culture: '진행 중',
+                    dressingHours: 48
+                },
+                riskFactors: [
+                    '중심정맥관 유지: 5일 이상',
+                    '면역억제: 스테로이드 사용 중',
+                    '다회 조작: CRRT 연결/분리',
+                    'TPN 투여 중'
+                ]
+            },
+            bed5: {
+                name: 'BED5 이OO (72세/여)',
+                catheterDays: 3,
+                insertionSite: '좌측 쇄골하정맥',
+                catheterType: 'Double lumen',
+                riskScore: 45,
+                wbc: 12.8,
+                temperature: 37.5,
+                siteStatus: {
+                    redness: false,
+                    tenderness: false,
+                    discharge: '없음',
+                    culture: '음성',
+                    dressingHours: 24
+                },
+                riskFactors: [
+                    '중심정맥관 유지: 3일',
+                    '고령: 72세',
+                    '당뇨병 기저질환',
+                    '영양불량 상태'
+                ]
+            },
+            bed8: {
+                name: 'BED8 김OO (45세/남)',
+                catheterDays: 2,
+                insertionSite: '우측 대퇴정맥',
+                catheterType: 'Dialysis catheter',
+                riskScore: 35,
+                wbc: 9.5,
+                temperature: 36.9,
+                siteStatus: {
+                    redness: false,
+                    tenderness: false,
+                    discharge: '없음',
+                    culture: '미시행',
+                    dressingHours: 12
+                },
+                riskFactors: [
+                    '중심정맥관 유지: 2일',
+                    '대퇴정맥 접근',
+                    '정상 면역 상태',
+                    '양호한 영양 상태'
+                ]
+            }
+        };
+        
+        // CLABSI 환자 선택 이벤트
+        document.getElementById('clabsiPatientSelect').addEventListener('change', function(e) {
+            const selectedBed = e.target.value;
+            updateCLABSICard(selectedBed);
+        });
+        
+        // CLABSI 카드 업데이트 함수
+        function updateCLABSICard(bedId) {
+            const patient = patientCLABSIData[bedId];
+            
+            // 환자 정보 업데이트
+            document.getElementById('clabsiPatientInfo').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <span><strong>${patient.name.split(' ')[0]}</strong> ${patient.name.split(' ')[1]}</span>
+                    <span>중심정맥관: ${patient.catheterDays}일째</span>
+                    <span>삽입부위: ${patient.insertionSite}</span>
+                    <span>카테터: ${patient.catheterType}</span>
+                </div>
+            `;
+            
+            // 위험도 업데이트
+            document.getElementById('clabsiRiskScore').textContent = patient.riskScore + '%';
+            const color = patient.riskScore > 60 ? '#f44336' : patient.riskScore > 40 ? '#ff9800' : '#4caf50';
+            document.getElementById('clabsiRiskScore').style.color = color;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('clabsiRiskIndicator').style.left = patient.riskScore + '%';
+            document.getElementById('clabsiRiskIndicator').style.background = color;
+            
+            // 지표 업데이트
+            document.getElementById('wbcChange').textContent = patient.wbc + 'K';
+            document.getElementById('wbcChange').style.color = patient.wbc > 12 ? '#ff9800' : '#4caf50';
+            
+            document.getElementById('tempValue').textContent = patient.temperature;
+            document.getElementById('tempValue').style.color = patient.temperature > 38 ? '#f44336' : patient.temperature > 37.5 ? '#ff9800' : '#4caf50';
+            
+            // 감염 징후 모니터링 업데이트
+            const siteColor = patient.siteStatus.redness ? '#f44336' : '#4caf50';
+            const dischargeColor = patient.siteStatus.discharge !== '없음' ? '#ff9800' : '#4caf50';
+            const cultureColor = patient.siteStatus.culture === '음성' ? '#4caf50' : patient.siteStatus.culture === '양성' ? '#f44336' : '#ff9800';
+            const dressingColor = patient.siteStatus.dressingHours > 72 ? '#f44336' : patient.siteStatus.dressingHours > 48 ? '#ff9800' : '#4caf50';
+            
+            document.getElementById('clabsiMonitoring').innerHTML = `
+                <div style="font-weight: 500; margin-bottom: 0.5rem; color: #c2185b;">
+                    <i class="fas fa-stethoscope"></i> 감염 징후 모니터링
+                </div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 0.75rem; font-size: 0.9rem;">
+                    <span style="color: ${siteColor};">●</span><span>삽입부위: 발적 (${patient.siteStatus.redness ? '+' : '-'}), 압통 (${patient.siteStatus.tenderness ? '+' : '-'})</span>
+                    <span style="color: ${dischargeColor};">●</span><span>분비물: ${patient.siteStatus.discharge}</span>
+                    <span style="color: ${cultureColor};">●</span><span>혈액배양: ${patient.siteStatus.culture}</span>
+                    <span style="color: ${dressingColor};">●</span><span>드레싱 상태: ${patient.siteStatus.dressingHours}시간 경과</span>
+                </div>
+            `;
+            
+            // 위험 요인 업데이트
+            const riskFactorsList = patient.riskFactors.map(factor => `<li>${factor}</li>`).join('');
+            document.getElementById('clabsiRiskFactors').innerHTML = `
+                <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                    <i class="fas fa-exclamation-circle"></i> CLABSI 위험 요인
+                </div>
+                <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                    ${riskFactorsList}
+                </ul>
+            `;
+        }
+        
+        // CLABSI 위험도 실시간 업데이트
+        function updateCLABSIRisk() {
+            const selectedBed = document.getElementById('clabsiPatientSelect').value;
+            const patient = patientCLABSIData[selectedBed];
+            
+            // 환자별 위험도 변동 시뮬레이션
+            const variation = Math.random() * 8 - 4; // -4 to +4 변동
+            let newRiskScore = patient.riskScore + variation;
+            newRiskScore = Math.max(10, Math.min(95, newRiskScore)); // 10-95% 범위 제한
+            
+            // 위험도 표시 업데이트
+            document.getElementById('clabsiRiskScore').textContent = Math.round(newRiskScore) + '%';
+            
+            // 위험도 색상 변경
+            const color = newRiskScore > 60 ? '#f44336' : newRiskScore > 40 ? '#ff9800' : '#4caf50';
+            document.getElementById('clabsiRiskScore').style.color = color;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('clabsiRiskIndicator').style.left = newRiskScore + '%';
+            document.getElementById('clabsiRiskIndicator').style.background = color;
+            
+            // WBC와 체온도 약간 변동
+            const wbcVariation = Math.random() * 1 - 0.5;
+            const newWBC = Math.max(4, patient.wbc + wbcVariation);
+            document.getElementById('wbcChange').textContent = newWBC.toFixed(1) + 'K';
+            
+            const tempVariation = Math.random() * 0.4 - 0.2;
+            const newTemp = Math.max(36, patient.temperature + tempVariation);
+            document.getElementById('tempValue').textContent = newTemp.toFixed(1);
+        }
+        
+        // 30초마다 CLABSI 위험도 업데이트
+        setInterval(updateCLABSIRisk, 30000);
+        
+        // CLABSI 번들 체크리스트 버튼
+        document.getElementById('clabsiChecklistBtn').addEventListener('click', function() {
+            alert('CLABSI 예방 번들 체크리스트:\n\n' +
+                  '✓ 손위생 수행\n' +
+                  '✓ 최대 멸균 차단법 준수\n' +
+                  '✓ 클로르헥시딘 피부 소독\n' +
+                  '✓ 최적 삽입 부위 선택 (대퇴 회피)\n' +
+                  '✓ 매일 카테터 필요성 재평가\n\n' +
+                  '드레싱 교체 주기:\n' +
+                  '- 투명 드레싱: 7일마다\n' +
+                  '- 거즈 드레싱: 2일마다\n' +
+                  '- 오염/느슨해진 경우: 즉시 교체');
+        });
+        
+        // CLABSI 관리 이력 버튼
+        document.getElementById('clabsiHistoryBtn').addEventListener('click', function() {
+            const selectedBed = document.getElementById('clabsiPatientSelect').value;
+            const patient = patientCLABSIData[selectedBed];
+            alert(`${patient.name} 중심정맥관 관리 이력:\n\n` +
+                  `삽입일: ${patient.catheterDays}일 전\n` +
+                  `삽입부위: ${patient.insertionSite}\n` +
+                  `카테터 종류: ${patient.catheterType}\n\n` +
+                  `최근 관리 기록:\n` +
+                  `- D-2: 드레싱 교체, 삽입부위 정상\n` +
+                  `- D-1: 혈액배양 검체 채취\n` +
+                  `- D-0: 발적 및 압통 발견, 감염내과 협진 의뢰`);
+        });
+        
         // 환자별 AKI 데이터
         const patientAKIData = {
             bed1: {
@@ -1046,14 +1381,30 @@
             console.log(`환자 ${selectedPatient}로 전환`);
             // 실제 구현시에는 환자별 데이터를 서버에서 가져와서 차트 업데이트
             
-            // AKI 선택도 동기화
+            // AKI와 CLABSI 선택도 동기화
             document.getElementById('akiPatientSelect').value = selectedPatient;
+            document.getElementById('clabsiPatientSelect').value = selectedPatient;
             updateAKICard(selectedPatient);
+            updateCLABSICard(selectedPatient);
         });
         
         // AKI 환자 선택 이벤트
         document.getElementById('akiPatientSelect').addEventListener('change', function(e) {
             const selectedBed = e.target.value;
+            updateAKICard(selectedBed);
+            // 다른 카드도 동기화
+            document.getElementById('patientSelect').value = selectedBed;
+            document.getElementById('clabsiPatientSelect').value = selectedBed;
+            updateCLABSICard(selectedBed);
+        });
+        
+        // CLABSI 환자 선택 이벤트
+        document.getElementById('clabsiPatientSelect').addEventListener('change', function(e) {
+            const selectedBed = e.target.value;
+            updateCLABSICard(selectedBed);
+            // 다른 카드도 동기화
+            document.getElementById('patientSelect').value = selectedBed;
+            document.getElementById('akiPatientSelect').value = selectedBed;
             updateAKICard(selectedBed);
         });
         
@@ -1069,8 +1420,9 @@
             alert('새 환자 등록 또는 긴급 알림 생성');
         });
         
-        // 초기 AKI 카드 설정
+        // 초기 AKI와 CLABSI 카드 설정
         updateAKICard('bed1');
+        updateCLABSICard('bed1');
         
         }); // DOMContentLoaded 종료
     </script>

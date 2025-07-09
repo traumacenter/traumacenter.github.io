@@ -432,16 +432,77 @@
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-bacteria" style="color: #f44336;"></i>
-                        <span>CAUTI 고위험: 301호 박OO (87% 확률)</span>
+                        <span>CAUTI 고위험: BED1 박OO (87% 확률)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-tint" style="color: #ff9800;"></i>
-                        <span>CLABSI 주의: 305호 이OO (65% 확률)</span>
+                        <span>CLABSI 주의: BED5 이OO (65% 확률)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-chart-line" style="color: #2196f3;"></i>
-                        <span>상태 악화 예측: 308호 김OO (24시간 내)</span>
+                        <span>상태 악화 예측: BED8 김OO (24시간 내)</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- 급성신손상 위험 예측 카드 추가 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-kidneys" style="color: #9c27b0;"></i> AKI 위험도 분석
+                    </h2>
+                    <select class="btn btn-secondary" id="akiPatientSelect" style="font-size: 0.9rem;">
+                        <option value="bed1">BED1 박OO</option>
+                        <option value="bed5">BED5 이OO</option>
+                        <option value="bed8">BED8 김OO</option>
+                    </select>
+                </div>
+                <!-- 환자 정보 표시 -->
+                <div id="akiPatientInfo" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <span><strong>BED1</strong> 박OO (65세/남)</span>
+                        <span>ISS: 28점</span>
+                        <span>입원: 72시간 경과</span>
+                        <span>진단: 다발성 외상</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 500;">48시간 내 AKI 발생 예측</span>
+                        <span id="akiRiskScore" style="font-size: 1.5rem; font-weight: 700; color: #f44336;">72%</span>
+                    </div>
+                    <div style="background: linear-gradient(to right, #4caf50 0%, #ffeb3b 50%, #f44336 100%); height: 8px; border-radius: 4px; position: relative;">
+                        <div id="akiRiskIndicator" style="position: absolute; left: 72%; top: -4px; width: 16px; height: 16px; background: #f44336; border-radius: 50%; border: 2px solid white;"></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">Cr 변화율</div>
+                        <div id="crChange" style="font-size: 1.25rem; font-weight: 600; color: #f44336;">↑ 45%</div>
+                    </div>
+                    <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">요량 (ml/hr)</div>
+                        <div id="urineOutput" style="font-size: 1.25rem; font-weight: 600; color: #ff9800;">28</div>
+                    </div>
+                </div>
+                <div id="akiRiskFactors" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                    <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                        <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                        <li>대량수혈: pRBC 14 units (4hr)</li>
+                        <li>횡문근융해증: CK 8,500</li>
+                        <li>저혈압: MAP < 65 (2hr)</li>
+                        <li>조영제 사용: 복부 CT (3회)</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-clipboard-check"></i> 예방 프로토콜
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1; font-size: 0.9rem;">
+                        <i class="fas fa-chart-bar"></i> 상세 분석
+                    </button>
                 </div>
             </div>
         </div>
@@ -453,7 +514,7 @@
             <div class="card patient-card high-risk">
                 <div class="patient-info">
                     <div>
-                        <div class="patient-name">301호 박OO (65세/남)</div>
+                        <div class="patient-name">BED1 박OO (65세/남)</div>
                         <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">CRRT 3일차</div>
                     </div>
                     <span class="risk-indicator risk-high">
@@ -488,7 +549,7 @@
             <div class="card patient-card medium-risk">
                 <div class="patient-info">
                     <div>
-                        <div class="patient-name">305호 이OO (72세/여)</div>
+                        <div class="patient-name">BED5 이OO (72세/여)</div>
                         <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">CRRT 5일차</div>
                     </div>
                     <span class="risk-indicator risk-medium">
@@ -526,9 +587,9 @@
                 <h2 class="card-title">실시간 생체 신호 모니터링</h2>
                 <div style="display: flex; gap: 1rem;">
                     <select class="btn btn-secondary" id="patientSelect">
-                        <option value="301">301호 박OO (고위험)</option>
-                        <option value="305">305호 이OO (중간위험)</option>
-                        <option value="308">308호 김OO (저위험)</option>
+                        <option value="bed1">BED1 박OO (고위험)</option>
+                        <option value="bed5">BED5 이OO (중간위험)</option>
+                        <option value="bed8">BED8 김OO (저위험)</option>
                     </select>
                     <button class="btn btn-primary">
                         <i class="fas fa-download"></i> 데이터 내보내기
@@ -571,7 +632,7 @@
                             <i class="fas fa-exclamation"></i>
                         </div>
                         <div class="priority-content">
-                            <div class="priority-title">301호 도뇨관 교체</div>
+                            <div class="priority-title">BED1 도뇨관 교체</div>
                             <div class="priority-desc">감염 위험 증가로 즉시 교체 필요</div>
                         </div>
                         <div class="priority-time">즉시</div>
@@ -581,7 +642,7 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="priority-content">
-                            <div class="priority-title">305호 필터 점검</div>
+                            <div class="priority-title">BED5 필터 점검</div>
                             <div class="priority-desc">응고 징후 확인 필요</div>
                         </div>
                         <div class="priority-time">30분 내</div>
@@ -591,7 +652,7 @@
                             <i class="fas fa-check"></i>
                         </div>
                         <div class="priority-content">
-                            <div class="priority-title">308호 정기 모니터링</div>
+                            <div class="priority-title">BED8 정기 모니터링</div>
                             <div class="priority-desc">활력징후 및 I/O 확인</div>
                         </div>
                         <div class="priority-time">1시간 내</div>
@@ -613,7 +674,7 @@
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div class="alert-content">
-                            <div class="alert-title">301호 CRRT 알람 발생</div>
+                            <div class="alert-title">BED1 CRRT 알람 발생</div>
                             <div class="alert-time">2분 전</div>
                         </div>
                     </div>
@@ -622,7 +683,7 @@
                             <i class="fas fa-thermometer-half"></i>
                         </div>
                         <div class="alert-content">
-                            <div class="alert-title">305호 체온 상승 (37.8°C)</div>
+                            <div class="alert-title">BED5 체온 상승 (37.8°C)</div>
                             <div class="alert-time">15분 전</div>
                         </div>
                     </div>
@@ -661,6 +722,9 @@
         
         // 1분마다 시간 업데이트
         setInterval(updateTime, 60000);
+        
+        // 페이지 로드 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
         
         // 바이탈 사인 차트 설정
         const ctx = document.getElementById('vitalSignsChart').getContext('2d');
@@ -825,12 +889,172 @@
             vitalSignsChart.update('none');
         }, 5000);
         
+        // 환자별 AKI 데이터
+        const patientAKIData = {
+            bed1: {
+                name: 'BED1 박OO (65세/남)',
+                iss: 28,
+                admissionHours: 72,
+                diagnosis: '다발성 외상',
+                riskScore: 72,
+                crChange: '↑ 45%',
+                crChangeValue: 45,
+                urineOutput: 28,
+                riskFactors: [
+                    '대량수혈: pRBC 14 units (4hr)',
+                    '횡문근융해증: CK 8,500',
+                    '저혈압: MAP < 65 (2hr)',
+                    '조영제 사용: 복부 CT (3회)'
+                ]
+            },
+            bed5: {
+                name: 'BED5 이OO (72세/여)',
+                iss: 22,
+                admissionHours: 120,
+                diagnosis: '복부 관통상',
+                riskScore: 45,
+                crChange: '↑ 22%',
+                crChangeValue: 22,
+                urineOutput: 42,
+                riskFactors: [
+                    '대량수혈: pRBC 8 units (4hr)',
+                    '패혈증 위험: WBC 18,000',
+                    '승압제 사용: Norepinephrine',
+                    '연령: 고령 (72세)'
+                ]
+            },
+            bed8: {
+                name: 'BED8 김OO (45세/남)',
+                iss: 18,
+                admissionHours: 48,
+                diagnosis: '흉부 외상',
+                riskScore: 25,
+                crChange: '↑ 10%',
+                crChangeValue: 10,
+                urineOutput: 65,
+                riskFactors: [
+                    '흉부 외상: 늑골 골절',
+                    '경미한 수혈: pRBC 4 units',
+                    '안정적 활력징후',
+                    '정상 요량 유지'
+                ]
+            }
+        };
+        
+        // AKI 환자 선택 이벤트
+        document.getElementById('akiPatientSelect').addEventListener('change', function(e) {
+            const selectedBed = e.target.value;
+            updateAKICard(selectedBed);
+        });
+        
+        // AKI 카드 업데이트 함수
+        function updateAKICard(bedId) {
+            const patient = patientAKIData[bedId];
+            
+            // 환자 정보 업데이트
+            document.getElementById('akiPatientInfo').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <span><strong>${patient.name.split(' ')[0]}</strong> ${patient.name.split(' ')[1]}</span>
+                    <span>ISS: ${patient.iss}점</span>
+                    <span>입원: ${patient.admissionHours}시간 경과</span>
+                    <span>진단: ${patient.diagnosis}</span>
+                </div>
+            `;
+            
+            // 위험도 업데이트
+            document.getElementById('akiRiskScore').textContent = patient.riskScore + '%';
+            const color = patient.riskScore > 70 ? '#f44336' : patient.riskScore > 40 ? '#ff9800' : '#4caf50';
+            document.getElementById('akiRiskScore').style.color = color;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('akiRiskIndicator').style.left = patient.riskScore + '%';
+            document.getElementById('akiRiskIndicator').style.background = color;
+            
+            // 지표 업데이트
+            document.getElementById('crChange').textContent = patient.crChange;
+            document.getElementById('crChange').style.color = patient.crChangeValue > 30 ? '#f44336' : '#ff9800';
+            
+            document.getElementById('urineOutput').textContent = patient.urineOutput;
+            document.getElementById('urineOutput').style.color = patient.urineOutput < 30 ? '#f44336' : patient.urineOutput < 50 ? '#ff9800' : '#4caf50';
+            
+            // 위험 요인 업데이트
+            const riskFactorsList = patient.riskFactors.map(factor => `<li>${factor}</li>`).join('');
+            document.getElementById('akiRiskFactors').innerHTML = `
+                <div style="font-weight: 500; margin-bottom: 0.5rem; color: #7b1fa2;">
+                    <i class="fas fa-exclamation-circle"></i> 주요 위험 요인
+                </div>
+                <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                    ${riskFactorsList}
+                </ul>
+            `;
+        }
+        
+        // AKI 위험도 실시간 업데이트
+        function updateAKIRisk() {
+            const selectedBed = document.getElementById('akiPatientSelect').value;
+            const patient = patientAKIData[selectedBed];
+            
+            // 환자별 위험도 변동 시뮬레이션
+            const variation = Math.random() * 10 - 5; // -5 to +5 변동
+            let newRiskScore = patient.riskScore + variation;
+            newRiskScore = Math.max(10, Math.min(95, newRiskScore)); // 10-95% 범위 제한
+            
+            // 위험도 표시 업데이트
+            document.getElementById('akiRiskScore').textContent = Math.round(newRiskScore) + '%';
+            
+            // 위험도 색상 변경
+            const color = newRiskScore > 70 ? '#f44336' : newRiskScore > 40 ? '#ff9800' : '#4caf50';
+            document.getElementById('akiRiskScore').style.color = color;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('akiRiskIndicator').style.left = newRiskScore + '%';
+            document.getElementById('akiRiskIndicator').style.background = color;
+            
+            // Cr 변화율도 약간 변동
+            const crVariation = Math.random() * 5 - 2.5;
+            const newCrChange = Math.max(0, patient.crChangeValue + crVariation);
+            document.getElementById('crChange').textContent = '↑ ' + Math.round(newCrChange) + '%';
+            
+            // 요량도 변동
+            const urineVariation = Math.random() * 10 - 5;
+            const newUrineOutput = Math.max(10, patient.urineOutput + urineVariation);
+            document.getElementById('urineOutput').textContent = Math.round(newUrineOutput);
+        }
+        
+        // 30초마다 AKI 위험도 업데이트
+        setInterval(updateAKIRisk, 30000);
+        
+        // 예방 프로토콜 버튼 클릭 이벤트
+        const preventionBtn = document.querySelector('.fa-clipboard-check').parentElement;
+        if (preventionBtn) {
+            preventionBtn.addEventListener('click', function() {
+                alert('AKI 예방 프로토콜:\n1. 수액 균형 최적화 (CVP 8-12)\n2. 신독성 약물 회피\n3. MAP > 65 유지\n4. 조영제 최소화\n5. 2시간마다 Cr/요량 모니터링');
+            });
+        }
+        
+        const analysisBtn = document.querySelector('.fa-chart-bar').parentElement;
+        if (analysisBtn) {
+            analysisBtn.addEventListener('click', function() {
+                alert('상세 분석 페이지로 이동합니다.\n- RIFLE/AKIN/KDIGO criteria 분석\n- 시간대별 위험도 추이\n- 예측 모델 상세 설명');
+            });
+        }
+
         // 환자 선택 변경 이벤트
         document.getElementById('patientSelect').addEventListener('change', function(e) {
             const selectedPatient = e.target.value;
             // 환자별로 다른 바이탈 범위 설정
-            console.log(`환자 ${selectedPatient}호로 전환`);
+            console.log(`환자 ${selectedPatient}로 전환`);
             // 실제 구현시에는 환자별 데이터를 서버에서 가져와서 차트 업데이트
+            
+            // AKI 선택도 동기화
+            document.getElementById('akiPatientSelect').value = selectedPatient;
+            updateAKICard(selectedPatient);
+        });
+        
+        // AKI 환자 선택 이벤트
+        document.getElementById('akiPatientSelect').addEventListener('change', function(e) {
+            const selectedBed = e.target.value;
+            updateAKICard(selectedBed);
         });
         
         // 클릭 이벤트 예시
@@ -844,6 +1068,11 @@
         document.querySelector('.fab').addEventListener('click', function() {
             alert('새 환자 등록 또는 긴급 알림 생성');
         });
+        
+        // 초기 AKI 카드 설정
+        updateAKICard('bed1');
+        
+        }); // DOMContentLoaded 종료
     </script>
 </body>
 </html>
